@@ -12,9 +12,16 @@
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">#000000</item>
 
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+
 
         <!-- You can also set colorControlNormal, colorControlActivated
         colorControlHighlight & colorSwitchThumbNormal. -->
+    </style>
+
+
+    <style name="TitleTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:labelTextSize">13sp</item>
     </style>
 
 

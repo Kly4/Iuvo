@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Iuvo</string>
+    <string name="study_session">Study Session</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_add">Settings</string>
 
