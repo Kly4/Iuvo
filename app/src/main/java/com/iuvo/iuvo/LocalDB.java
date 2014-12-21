@@ -2,43 +2,47 @@ package com.iuvo.iuvo;
 
 import org.json.*;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import com.iuvo.iuvo.schemas.*;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by Dan on 2014-12-20.
  */
 public class LocalDB {
-    // For now we just work with JSON objects directly. I don't see
-    // a reason not to in the long run either.
+    private static final String TAG = "LocalDB";
 
     /**
      * This will send an HTTP call to the remote server, requesting updates from the user's classes.
      */
-    public static void update() {
-
-    }
-
-    /**
-     * Returns all the events pertinent to the user. This will query the local DB.
-     */
-    public static ArrayList<JSONObject> getEvents() {
-        ArrayList<JSONObject> ret = new ArrayList<JSONObject>();
-
+    public static void update(Context ctx) {
         try {
-            InputStream is = new FileInputStream("events.json");
-            String jsonTxt = convertStreamToString(is);
+            InputStream is = ctx.getAssets().open("events.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
 
+            String jsonTxt = new String(buffer, "UTF-8");
             JSONArray json = new JSONArray(jsonTxt);
-            for (int i = 0; i < json.length(); i++)
-                ret.add(json.getJSONObject(i));
 
-            return ret;
+            Log.v(TAG, "Creating " + json.length() + " new Events");
+            for (int i = 0; i < json.length(); i++)
+                JSONSchema.createEvent(ctx, json.getJSONObject(i));
         }
-        catch (JSONException |FileNotFoundException ex) {
-            return ret;
+        catch (JSONException | IOException ex) {
+            Log.e(TAG, "Failed to update", ex);
         }
     }
 
@@ -47,5 +51,4 @@ public class LocalDB {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
-
 }

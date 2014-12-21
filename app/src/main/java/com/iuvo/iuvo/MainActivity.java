@@ -1,8 +1,11 @@
 package com.iuvo.iuvo;
 
+import com.iuvo.iuvo.schemas.*;
+
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,16 +20,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmBaseAdapter;
+import io.realm.RealmResults;
+
 
 public class MainActivity extends ActionBarActivity {
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // This will produce duplicates in our current setup. I'll fix...
+        LocalDB.update(this);
+        Realm realm = Realm.getInstance(this);
+
         ListView view = (ListView) findViewById(R.id.event_list);
-        view.setAdapter(new CustomAdapter(this, LocalDB.getEvents()));
+        view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
     }
 
     @Override
@@ -51,29 +63,42 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class CustomAdapter extends ArrayAdapter<JSONObject> {
+    class CustomAdapter extends RealmBaseAdapter<Event> {
+        private static final String TAG = "CustomAdapter";
         private final Context context;
-        private final ArrayList<JSONObject> values;
+        private final RealmResults<Event> values;
 
-        public CustomAdapter(Context context, ArrayList<JSONObject> values) {
-            super(context, R.layout.row_layout, values);
+
+        public CustomAdapter(Context context, RealmResults<Event> values) {
+            super(context, values, false);
             this.context = context;
             this.values = values;
+
+            Log.v(TAG, "Launched with " + values.size() + " elements");
+        }
+
+        // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
+        class ViewHolder {
+            TextView title;
+            int position;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.row_layout, parent, false);
 
-            TextView textView = (TextView) rowView.findViewById(R.id.testItem);
-            try {
-                textView.setText(values.get(position).getString("title"));
-            } catch (JSONException ex) {
-                textView.setText("");
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.row_layout, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.testItem);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
-            return rowView;
+
+            Event item = realmResults.get(position);
+            viewHolder.title.setText(item.getTitle());
+            return convertView;
         }
     }
 }
