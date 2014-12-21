@@ -7,7 +7,7 @@
     {"subject" "Bio": ,
      "course-code": "151" ,
      "title": "Intro to bio",
-     "instructor" "Some Joe":
+     "instructor": "Some Joe"
     },
     {"subject": "CS",
      "course-code": "240",
