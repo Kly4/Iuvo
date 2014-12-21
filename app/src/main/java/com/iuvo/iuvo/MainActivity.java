@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.testItem);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.clssname);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
