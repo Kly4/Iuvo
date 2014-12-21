@@ -1,0 +1,28 @@
+// Fill in as appropriate, and delete this comment because I don't think it will parse.
+[
+    {"subject": "CS",
+     "course-code": "123",
+     "title": "Into to CS",
+     "instructor": "Plyukhin"
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "instructor":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "instructor":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "instructor":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "instructor":
+    }
+]

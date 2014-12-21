@@ -5,5 +5,12 @@
     android:background="@android:color/darker_gray">
 
 
+    <ListView
+        android:id="@+id/event-list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+    </ListView>
     
 </RelativeLayout>

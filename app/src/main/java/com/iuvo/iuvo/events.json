@@ -1,0 +1,34 @@
+// course-code is a string type, but num-attendees and num-comments are integers.
+// DELETE THIS COMMENT BEFORE RUNNING
+[
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "num-attendees": ,
+     "num-comments":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "num-attendees": ,
+     "num-comments":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "num-attendees": ,
+     "num-comments":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "num-attendees": ,
+     "num-comments":
+    },
+    {"subject": ,
+     "course-code": ,
+     "title": ,
+     "num-attendees": ,
+     "num-comments":
+    }
+]
