@@ -1,10 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingTop="10sp">
 
     <TextView
         android:id="@+id/testItem"
         android:layout_width="match_parent"
+        android:layout_height="75sp"
+        android:layout_alignParentTop="false"
+        android:layout_toEndOf="@+id/leftblock"
+        android:layout_marginRight="45sp" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
-</LinearLayout>
+
+        android:id="@+id/radioButton"
+        android:layout_alignBottom="@+id/testItem"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Attd"
+        android:id="@+id/attd"
+        android:layout_alignTop="@+id/testItem"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/radioButton"
+        android:layout_marginRight="10sp"
+        android:layout_alignParentStart="false" />
+
+    <LinearLayout
+        android:id="@+id/leftblock"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="75sp"
+        android:layout_alignParentStart="false"
+        android:layout_alignBottom="@+id/radioButton"
+        android:background="@android:color/holo_blue_dark"
+        android:textAlignment="center">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Class Name"
+                android:id="@+id/clssname"
+                android:gravity="center"
+                android:elegantTextHeight="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Class #"
+            android:id="@+id/clssnmbr"
+            android:gravity="center"
+            android:elegantTextHeight="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Date"
+            android:id="@+id/date"
+            android:gravity="center"
+            android:elegantTextHeight="false" />
+
+    </LinearLayout>
+
+</RelativeLayout>
