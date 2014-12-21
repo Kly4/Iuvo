@@ -1,28 +1,27 @@
-// Fill in as appropriate, and delete this comment because I don't think it will parse.
 [
     {"subject": "CS",
      "course-code": "123",
      "title": "Into to CS",
      "instructor": "Plyukhin"
     },
-    {"subject": ,
-     "course-code": ,
-     "title": ,
-     "instructor":
+    {"subject" "Bio": ,
+     "course-code": "151" ,
+     "title": "Intro to bio",
+     "instructor" "Some Joe":
     },
-    {"subject": ,
-     "course-code": ,
-     "title": ,
-     "instructor":
+    {"subject": "CS",
+     "course-code": "240",
+     "title": "Reasoning under uncertainty",
+     "instructor": "Jensen"
     },
-    {"subject": ,
-     "course-code": ,
-     "title": ,
-     "instructor":
+    {"subject": "ECE",
+     "course-code": "110",
+     "title": "Basic Systems",
+     "instructor": "Wolf"
     },
-    {"subject": ,
-     "course-code": ,
-     "title": ,
-     "instructor":
+    {"subject": "CS",
+     "course-code": "311",
+     "title": "Algorithms",
+     "instructor": "Richards"
     }
 ]
