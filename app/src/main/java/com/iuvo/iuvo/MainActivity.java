@@ -86,18 +86,30 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ViewHolder viewHolder;
+            ViewHolder viewHolder1;
+            ViewHolder viewHolder2;
+            ViewHolder viewHolder3;
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.clssname);
-                convertView.setTag(viewHolder);
+                viewHolder1 = new ViewHolder();
+                viewHolder2 = new ViewHolder();
+                viewHolder3 = new ViewHolder();
+                viewHolder1.title = (TextView) convertView.findViewById(R.id.clssname);
+                viewHolder2.title =(TextView) convertView.findViewById(R.id.clssnmbr);
+                viewHolder3.title =(TextView) convertView.findViewById(R.id.date);
+                convertView.setTag(viewHolder1);
+                convertView.setTag(viewHolder2);
+                convertView.setTag(viewHolder3);
             } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+                viewHolder1 = (ViewHolder) convertView.getTag();
+                viewHolder2 = (ViewHolder) convertView.getTag();
+                viewHolder3 = (ViewHolder) convertView.getTag();
             }
 
             Event item = realmResults.get(position);
-            viewHolder.title.setText(item.getTitle());
+            viewHolder1.title.setText(item.getSubject());
+            viewHolder2.title.setText(item.getCourseCode());
+            viewHolder3.title.setText("Dec 21");
             return convertView;
         }
     }
