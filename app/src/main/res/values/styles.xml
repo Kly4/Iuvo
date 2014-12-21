@@ -7,7 +7,7 @@
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">#00ff00</item>
+        <item name="colorPrimary">#00e676</item>
 
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">#000000</item>
