@@ -79,7 +79,9 @@
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10sp"
-        android:checked="true" />
+        android:checked="false"
+        android:button="@android:color/transparent"
+        android:background="@drawable/checkbutton" />
 
     <TextView
         android:layout_width="wrap_content"
