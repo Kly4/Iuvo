@@ -47,7 +47,10 @@
         android:layout_alignParentEnd="false"
         android:layout_marginRight="10sp"
         android:layout_alignStart="@+id/radioButton"
-        android:layout_above="@+id/radioButton" />
+        android:layout_above="@+id/radioButton"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textAlignment="center" />
 
     <LinearLayout
         android:id="@+id/leftblock"

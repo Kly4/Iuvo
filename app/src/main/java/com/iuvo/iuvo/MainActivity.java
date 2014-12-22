@@ -89,27 +89,33 @@ public class MainActivity extends ActionBarActivity {
             ViewHolder viewHolder1;
             ViewHolder viewHolder2;
             ViewHolder viewHolder3;
+            ViewHolder viewHolder4;
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
                 viewHolder1 = new ViewHolder();
                 viewHolder2 = new ViewHolder();
                 viewHolder3 = new ViewHolder();
+                viewHolder4 = new ViewHolder();
                 viewHolder1.title = (TextView) convertView.findViewById(R.id.clssname);
                 viewHolder2.title =(TextView) convertView.findViewById(R.id.clssnmbr);
                 viewHolder3.title =(TextView) convertView.findViewById(R.id.date);
+                viewHolder4.title =(TextView) convertView.findViewById(R.id.attd);
                 convertView.setTag(viewHolder1);
                 convertView.setTag(viewHolder2);
                 convertView.setTag(viewHolder3);
+                convertView.setTag(viewHolder4);
             } else {
                 viewHolder1 = (ViewHolder) convertView.getTag();
                 viewHolder2 = (ViewHolder) convertView.getTag();
                 viewHolder3 = (ViewHolder) convertView.getTag();
+                viewHolder4 = (ViewHolder) convertView.getTag();
             }
 
             Event item = realmResults.get(position);
             viewHolder1.title.setText(item.getSubject());
             viewHolder2.title.setText(item.getCourseCode());
             viewHolder3.title.setText("Dec 21");
+            viewHolder4.title.setText(String.valueOf(item.getNumAttendees()));
             return convertView;
         }
     }
