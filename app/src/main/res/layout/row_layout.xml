@@ -9,18 +9,60 @@
         android:layout_width="wrap_content"
         android:layout_height="85sp"
         android:layout_toRightOf="@+id/leftblock"
-        android:layout_toLeftOf="@+id/radioButton">
+        android:layout_toLeftOf="@+id/radioButton"
+        android:layout_alignParentEnd="false">
 
 
         <TextView
-            android:id="@+id/testItem"
+            android:id="@+id/timetill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/leftblock"
             android:textAlignment="center"
             android:layout_toRightOf="@+id/leftblock"
             android:layout_toLeftOf="@+id/attd"
-            android:gravity="bottom" />
+            android:gravity="bottom"
+            android:text="time till"
+            android:layout_marginLeft="10sp"
+            android:textStyle="italic" />
+
+        <View style="@style/Divider"
+            android:layout_marginLeft="10sp" />
+
+        <TextView
+            android:id="@+id/timeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/leftblock"
+            android:textAlignment="center"
+            android:layout_toRightOf="@+id/leftblock"
+            android:layout_toLeftOf="@+id/attd"
+            android:gravity="bottom"
+            android:text="time at"
+            android:layout_marginLeft="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/leftblock"
+            android:textAlignment="center"
+            android:layout_toRightOf="@+id/leftblock"
+            android:layout_toLeftOf="@+id/attd"
+            android:gravity="bottom"
+            android:text="location"
+            android:layout_marginLeft="10sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dots"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_more_horiz_black_24dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="5sp" />
+
 
     </LinearLayout>
 
@@ -36,7 +78,8 @@
         android:layout_alignParentEnd="false"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10sp" />
+        android:layout_marginRight="10sp"
+        android:checked="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -72,7 +115,9 @@
                 android:gravity="center"
                 android:elegantTextHeight="false"
                 android:layout_marginTop="5sp"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:textSize="15sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -82,8 +127,10 @@
             android:id="@+id/clssnmbr"
             android:gravity="center"
             android:elegantTextHeight="false"
-            android:layout_marginTop="5sp"
-            android:textColor="#ffffff" />
+            android:layout_marginTop="0dp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -93,7 +140,7 @@
             android:id="@+id/date"
             android:gravity="center"
             android:elegantTextHeight="false"
-            android:layout_marginTop="5sp"
+            android:layout_marginTop="0dp"
             android:textColor="#ffffff" />
 
     </LinearLayout>
