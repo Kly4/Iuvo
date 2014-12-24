@@ -6,19 +6,13 @@ import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -104,10 +98,10 @@ public class MainActivity extends ActionBarActivity {
 
             ViewHolder[] views = new ViewHolder[4];
             int[] ids = {
-                R.id.clssname,
-                R.id.clssnmbr,
+                R.id.classname,
+                R.id.classnumber,
                 R.id.date,
-                R.id.attd
+                R.id.attendance
             };
 
             if (convertView == null) {
