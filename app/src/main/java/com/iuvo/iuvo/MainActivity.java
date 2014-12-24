@@ -98,7 +98,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ViewHolder[] views;
+            ViewHolder[] views = new ViewHolder[4];
             int[] ids = {
                 R.id.clssname,
                 R.id.clssnmbr,
@@ -108,13 +108,13 @@ public class MainActivity extends ActionBarActivity {
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
-                views = new ViewHolder[4];
                 for (int i = 0; i < views.length; i++) {
                     views[i].title = (TextView) convertView.findViewById(ids[i]);
+                    convertView.setTag(i, views[i]);
                 }
-                convertView.setTag(views);
             } else {
-                views = (ViewHolder[]) convertView.getTag();
+                for (int i = 0; i < views.length; i++)
+                    views[i] = (ViewHolder) convertView.getTag(i);
             }
             //
             Event item = realmResults.get(position);
