@@ -116,7 +116,7 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 views = (ViewHolder[]) convertView.getTag();
             }
-
+            //
             Event item = realmResults.get(position);
             views[0].title.setText(item.getSubject());
             views[1].title.setText(item.getCourseCode());
