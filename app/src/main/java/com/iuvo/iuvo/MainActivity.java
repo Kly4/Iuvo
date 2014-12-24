@@ -122,6 +122,7 @@ public class MainActivity extends ActionBarActivity {
             views[1].title.setText(item.getCourseCode());
             views[2].title.setText("Dec 21");
             views[3].title.setText(String.valueOf(item.getNumAttendees()));
+            courseColors.get(item.getCourse());
             return convertView;
         }
     }
