@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
             Realm realm = Realm.getInstance(context);
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
-            String[] colors = {"1", "2", "3", "4", "5", "6", "7"};
+            String[] colors = getResources().getStringArray(R.array.colors);
             int i = 0;
             for (Course course : courses) {
                 courseColors.put(course, colors[i++ % 6]);
