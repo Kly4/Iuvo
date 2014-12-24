@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -67,12 +68,23 @@ public class MainActivity extends ActionBarActivity {
         private static final String TAG = "CustomAdapter";
         private final Context context;
         private final RealmResults<Event> values;
+        private HashMap<Course, String> courseColors;
+        // private Realm realm;
 
 
         public CustomAdapter(Context context, RealmResults<Event> values) {
             super(context, values, false);
             this.context = context;
             this.values = values;
+
+            Realm realm = Realm.getInstance(context);
+            RealmResults<Course> courses = realm.where(Course.class).findAll();
+            courseColors = new HashMap<>();
+            String[] colors = {"1", "2", "3", "4", "5", "6", "7"};
+            int i = 0;
+            for (Course course : courses) {
+                courseColors.put(course, colors[i++ % 6]);
+            }
 
             Log.v(TAG, "Launched with " + values.size() + " elements");
         }
