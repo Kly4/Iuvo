@@ -109,12 +109,12 @@ public class MainActivity extends ActionBarActivity {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
                 for (int i = 0; i < views.length; i++) {
+                    views[i] = new ViewHolder();
                     views[i].title = (TextView) convertView.findViewById(ids[i]);
-                    convertView.setTag(i, views[i]);
                 }
+                convertView.setTag(views);
             } else {
-                for (int i = 0; i < views.length; i++)
-                    views[i] = (ViewHolder) convertView.getTag(i);
+                views = (ViewHolder[]) convertView.getTag();
             }
             //
             Event item = realmResults.get(position);
