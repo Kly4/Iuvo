@@ -122,7 +122,7 @@ public class MainActivity extends ActionBarActivity {
                 viewHolder3 = (ViewHolder) convertView.getTag();
                 viewHolder4 = (ViewHolder) convertView.getTag();
             }
-
+            //
             Event item = realmResults.get(position);
             viewHolder1.title.setText(item.getSubject());
             viewHolder2.title.setText(item.getCourseCode());
