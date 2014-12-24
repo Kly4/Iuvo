@@ -6,6 +6,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_add">Settings</string>
     <string name="Attd">Attd</string>
-    <array name="colors">"#0091EA", "#00C853", "#F44336", "#FF8F00"</array>
+
+    <string-array name="colors">
+        <item>#0091EA</item>
+        <item>#00C853</item>
+        <item>#F44336</item>
+        <item>#FF8F00</item>
+    </string-array>
 
 </resources>

@@ -28,7 +28,7 @@ public class LocalDB {
      */
     public static void update(Context ctx) {
         try {
-            InputStream is = ctx.getAssets().open("events.json");
+            InputStream is = ctx.getAssets().open("courses.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -36,6 +36,20 @@ public class LocalDB {
 
             String jsonTxt = new String(buffer, "UTF-8");
             JSONArray json = new JSONArray(jsonTxt);
+
+            Log.v(TAG, "Creating " + json.length() + " new Courses");
+            for (int i = 0; i < json.length(); i++)
+                JSONSchema.createCourse(ctx, json.getJSONObject(i));
+
+
+            is = ctx.getAssets().open("events.json");
+            size = is.available();
+            buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            jsonTxt = new String(buffer, "UTF-8");
+            json = new JSONArray(jsonTxt);
 
             Log.v(TAG, "Creating " + json.length() + " new Events");
             for (int i = 0; i < json.length(); i++)

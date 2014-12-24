@@ -1,27 +1,25 @@
 [
     {"subject": "CS",
-     "course-code": "123",
+     "course-code": "121",
      "title": "Into to CS",
      "instructor": "Plyukhin"
     },
-    {"subject" "Bio": ,
+    {"subject": "Bio",
      "course-code": "151" ,
      "title": "Intro to bio",
      "instructor": "Some Joe"
     },
     {"subject": "CS",
-     "course-code": "240",
+     "course-code": "220",
      "title": "Reasoning under uncertainty",
      "instructor": "Jensen"
     },
-    {"subject": "ECE",
-     "course-code": "110",
-     "title": "Basic Systems",
-     "instructor": "Wolf"
+    {"subject": "CS" ,
+     "course-code": "311" ,
+     "title": "Algorithms"
     },
-    {"subject": "CS",
-     "course-code": "311",
-     "title": "Algorithms",
-     "instructor": "Richards"
+    {"subject": "ECE" ,
+     "course-code": "121" ,
+     "title": "Intro to ECE"
     }
 ]

@@ -2,31 +2,26 @@
     {"subject": "CS" ,
      "course-code": "121" ,
      "title": "Intro to CS" ,
-     "num-attendees": 13,
-     "num-comments": 2
+     "num-attendees": 13
     },
     {"subject": "Bio" ,
      "course-code": "151" ,
      "title": "Intro to Bio" ,
-     "num-attendees": 23,
-     "num-comments": 8
+     "num-attendees": 23
     },
     {"subject": "CS" ,
      "course-code": "220" ,
      "title": "Programming Methodology" ,
-     "num-attendees": 11,
-     "num-comments": 1
+     "num-attendees": 11
     },
     {"subject": "CS" ,
      "course-code": "311" ,
      "title": "Algorithms" ,
-     "num-attendees": 16,
-     "num-comments": 8
+     "num-attendees": 16
     },
     {"subject": "ECE" ,
      "course-code": "121" ,
      "title": "Intro to ECE" ,
-     "num-attendees": 18,
-     "num-comments": 7
+     "num-attendees": 18
     }
 ]

@@ -9,27 +9,17 @@ import io.realm.RealmObject;
 * Created by Dan on 2014-12-21.
 */
 public class Event extends RealmObject {
-    private String subject;
-    private String courseCode;
+    private Course course;
     private String title;
     private String description;
     private int numAttendees;
-    private int numComments;
 
-    public String getSubject() {
-        return subject;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getCourseCode() {
-        return courseCode;
-    }
-
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getTitle() {
@@ -54,13 +44,5 @@ public class Event extends RealmObject {
 
     public void setNumAttendees(int numAttendees) {
         this.numAttendees = numAttendees;
-    }
-
-    public int getNumComments() {
-        return numComments;
-    }
-
-    public void setNumComments(int numComments) {
-        this.numComments = numComments;
     }
 }

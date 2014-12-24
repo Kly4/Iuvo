@@ -34,9 +34,12 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // idk lol
+        Realm.deleteRealmFile(this);
         // This will produce duplicates in our current setup. I'll fix...
-        LocalDB.update(this);
         Realm realm = Realm.getInstance(this);
+        LocalDB.update(this);
+
 
         ListView view = (ListView) findViewById(R.id.event_list);
         view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
@@ -81,9 +84,10 @@ public class MainActivity extends ActionBarActivity {
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
             String[] colors = getResources().getStringArray(R.array.colors);
+
             int i = 0;
             for (Course course : courses) {
-                courseColors.put(course, colors[i++ % 6]);
+                courseColors.put(course, colors[i++ % colors.length]);
             }
 
             Log.v(TAG, "Launched with " + values.size() + " elements");
@@ -118,8 +122,9 @@ public class MainActivity extends ActionBarActivity {
             }
             //
             Event item = realmResults.get(position);
-            views[0].title.setText(item.getSubject());
-            views[1].title.setText(item.getCourseCode());
+            Course course = item.getCourse();
+            views[0].title.setText(course.getSubject());
+            views[1].title.setText(course.getCourseCode());
             views[2].title.setText("Dec 21");
             views[3].title.setText(String.valueOf(item.getNumAttendees()));
             courseColors.get(item.getCourse());
