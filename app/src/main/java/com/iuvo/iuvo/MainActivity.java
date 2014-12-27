@@ -1,6 +1,8 @@
 package com.iuvo.iuvo;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -73,6 +76,15 @@ public class MainActivity extends ActionBarActivity {
         private final RealmResults<Event> values;
         private HashMap<Course, String> courseColors;
         private Realm realm;
+        LinearLayout leftblock;
+        GradientDrawable shape;
+
+
+//        View v = findViewById(R.id.layout_id);
+//
+//        LayerDrawable bgDrawable = (LayerDrawable)v.getBackground();
+//        final GradientDrawable shape = (GradientDrawable)   bgDrawable.findDrawableByLayerId(R.id.shape_id);
+//        shape.setColor(----);
 
 
         public CustomAdapter(Context context, RealmResults<Event> values) {
@@ -105,6 +117,7 @@ public class MainActivity extends ActionBarActivity {
             TextView attendance;
 
 
+
             public ViewHolder(View convertView, int position) {
                 subject = (TextView) convertView.findViewById(R.id.classname);
                 code = (TextView) convertView.findViewById(R.id.classnumber);
@@ -117,6 +130,10 @@ public class MainActivity extends ActionBarActivity {
                 Event item = realmResults.get(position);
                 checkbox.setTag(item);
                 checkbox.setChecked(item.isCheckState());
+                leftblock = (LinearLayout) convertView.findViewById(R.id.leftblock);
+                shape = (GradientDrawable) leftblock.getBackground();
+
+
             }
         }
 
@@ -160,7 +177,7 @@ public class MainActivity extends ActionBarActivity {
 
             Course course = item.getCourse();
             String color = courseColors.get(course);
-            // TODO: Set the color background color for view.shape
+            shape.setColor(Color.parseColor(color));
 
             view.timeAt.setText(item.getTimeAt());
             view.timeTill.setText(item.getTimeTill());
