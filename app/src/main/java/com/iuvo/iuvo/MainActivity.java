@@ -3,6 +3,8 @@ package com.iuvo.iuvo;
 import com.iuvo.iuvo.schemas.*;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -89,39 +93,45 @@ public class MainActivity extends ActionBarActivity {
 
         // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
         class ViewHolder {
-            TextView title;
-            int position;
+            TextView subject;
+            TextView code;
+            TextView date;
+            RadioButton radio;
+            TextView attendance;
+
+            public ViewHolder(View convertView) {
+                subject = (TextView) convertView.findViewById(R.id.classname);
+                code = (TextView) convertView.findViewById(R.id.classnumber);
+                date = (TextView) convertView.findViewById(R.id.date);
+
+                radio = (RadioButton) convertView.findViewById(R.id.radioButton);
+                attendance = (TextView) convertView.findViewById(R.id.attendance);
+            }
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ViewHolder[] views = new ViewHolder[4];
-            int[] ids = {
-                R.id.classname,
-                R.id.classnumber,
-                R.id.date,
-                R.id.attendance
-            };
+            ViewHolder view;
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
-                for (int i = 0; i < views.length; i++) {
-                    views[i] = new ViewHolder();
-                    views[i].title = (TextView) convertView.findViewById(ids[i]);
-                }
-                convertView.setTag(views);
+                view = new ViewHolder(convertView);
+                convertView.setTag(view);
             } else {
-                views = (ViewHolder[]) convertView.getTag();
+                view = (ViewHolder) convertView.getTag();
             }
-            //
+
             Event item = realmResults.get(position);
             Course course = item.getCourse();
-            views[0].title.setText(course.getSubject());
-            views[1].title.setText(course.getCourseCode());
-            views[2].title.setText("Dec 21");
-            views[3].title.setText(String.valueOf(item.getNumAttendees()));
-            courseColors.get(item.getCourse());
+            String color = courseColors.get(course);
+            // TODO: Set the color background color for view.shape
+
+            view.subject.setText(course.getSubject());
+            view.code.setText(course.getCourseCode());
+            view.date.setText("Dec 21");
+            view.attendance.setText(String.valueOf(item.getNumAttendees()));
+
             return convertView;
         }
     }
