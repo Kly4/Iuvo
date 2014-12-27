@@ -12,6 +12,34 @@ public class Event extends RealmObject {
     private int numAttendees;
     private boolean checkState;
 
+    private String timeAt;
+    private String timeTill;
+    private String location;
+
+    public String getTimeAt() {
+        return timeAt;
+    }
+
+    public void setTimeAt(String timeAt) {
+        this.timeAt = timeAt;
+    }
+
+    public String getTimeTill() {
+        return timeTill;
+    }
+
+    public void setTimeTill(String timeTill) {
+        this.timeTill = timeTill;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public boolean isCheckState() { return checkState; }
 
     public void setCheckState(boolean checkState) { this.checkState = checkState; }

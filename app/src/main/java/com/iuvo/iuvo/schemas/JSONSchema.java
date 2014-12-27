@@ -1,13 +1,12 @@
 package com.iuvo.iuvo.schemas;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.realm.Realm;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
 
 /**
 * Created by Dan on 2014-12-21.
@@ -51,7 +50,11 @@ public class JSONSchema {
                     json.getString("subject"),
                     json.getString("course-code"),
                     json.getString("title"),
-                    json.optString("description", "")
+                    json.optString("description", ""),
+                    json.optString("timeTill", ""),
+                    json.optString("timeAt", ""),
+                    json.optString("location", "")
+
             };
             int int_fields[] = {
                     json.getInt("num-attendees")
@@ -63,6 +66,9 @@ public class JSONSchema {
                                  .findFirst();
 
             Event event = realm.createObject(Event.class);
+            event.setTimeAt(fields[5]);
+            event.setTimeTill(fields[4]);
+            event.setLocation(fields[6]);
             event.setCourse(course);
             event.setTitle(fields[2]);
             event.setDescription(fields[3]);

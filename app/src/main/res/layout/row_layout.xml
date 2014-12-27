@@ -68,11 +68,11 @@
     </LinearLayout>
 
             <CheckBox
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:tag=""
                 android:id="@+id/button"
-                android:layout_marginRight="10sp"
+                android:layout_marginRight="20sp"
                 android:checked="true"
                 android:button="@android:color/transparent"
                 android:background="@drawable/checkbutton"
@@ -81,7 +81,7 @@
                 android:clickable="true"
                 android:layout_alignParentBottom="false"
                 android:layout_alignBottom="@+id/midblock"
-                android:layout_marginBottom="15dp" />
+                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,7 +90,7 @@
                 android:text="@string/Attd"
                 android:id="@+id/attendance"
                 android:layout_alignParentEnd="false"
-                android:layout_marginRight="10sp"
+                android:layout_marginRight="20sp"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textAlignment="center"

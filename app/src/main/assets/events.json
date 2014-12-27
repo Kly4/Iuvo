@@ -2,26 +2,41 @@
     {"subject": "CS" ,
      "course-code": "121" ,
      "title": "Intro to CS" ,
+     "timeAt": "4:20 pm" ,
+     "timeTill": "in 1 hour",
+     "location": "library, floor 9",
      "num-attendees": 13
     },
     {"subject": "Bio" ,
      "course-code": "151" ,
      "title": "Intro to Bio" ,
+     "timeAt": "3:00 pm" ,
+     "timeTill": "in 15 minutes",
+     "location": "Bio lab",
      "num-attendees": 23
     },
     {"subject": "CS" ,
      "course-code": "220" ,
      "title": "Programming Methodology" ,
+     "timeAt": "4:20 pm" ,
+     "timeTill": "in 1 hour",
+     "location": "library, floor 9",
      "num-attendees": 11
     },
     {"subject": "CS" ,
      "course-code": "311" ,
      "title": "Algorithms" ,
+     "timeAt": "4:20 pm" ,
+     "timeTill": "in 1 hour" ,
+     "location": "library, floor 9",
      "num-attendees": 16
     },
     {"subject": "ECE" ,
      "course-code": "121" ,
      "title": "Intro to ECE" ,
+     "timeAt": "4:20 pm" ,
+     "timeTill": "in 1 hour",
+     "location": "library, floor 9",
      "num-attendees": 18
     }
 ]

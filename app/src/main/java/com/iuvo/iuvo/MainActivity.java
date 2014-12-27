@@ -98,6 +98,9 @@ public class MainActivity extends ActionBarActivity {
             TextView subject;
             TextView code;
             TextView date;
+            TextView timeAt;
+            TextView timeTill;
+            TextView location;
             CheckBox checkbox;
             TextView attendance;
 
@@ -106,6 +109,9 @@ public class MainActivity extends ActionBarActivity {
                 subject = (TextView) convertView.findViewById(R.id.classname);
                 code = (TextView) convertView.findViewById(R.id.classnumber);
                 date = (TextView) convertView.findViewById(R.id.date);
+                timeAt = (TextView) convertView.findViewById(R.id.timeat);
+                timeTill = (TextView) convertView.findViewById(R.id.timetill);
+                location = (TextView) convertView.findViewById(R.id.location);
                 checkbox = (CheckBox) convertView.findViewById(R.id.button);
                 attendance = (TextView) convertView.findViewById(R.id.attendance);
                 Event item = realmResults.get(position);
@@ -156,6 +162,9 @@ public class MainActivity extends ActionBarActivity {
             String color = courseColors.get(course);
             // TODO: Set the color background color for view.shape
 
+            view.timeAt.setText(item.getTimeAt());
+            view.timeTill.setText(item.getTimeTill());
+            view.location.setText(item.getLocation());
             view.subject.setText(course.getSubject());
             view.code.setText(course.getCourseCode());
             view.date.setText("Dec 21");
