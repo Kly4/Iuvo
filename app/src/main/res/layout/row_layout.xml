@@ -9,8 +9,9 @@
         android:layout_width="wrap_content"
         android:layout_height="85sp"
         android:layout_toRightOf="@+id/leftblock"
-        android:layout_toLeftOf="@+id/radioButton"
-        android:layout_alignParentEnd="false">
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="40dp">
 
 
         <TextView
@@ -66,36 +67,43 @@
 
     </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag=""
+                android:id="@+id/button"
+                android:layout_marginRight="10sp"
+                android:checked="false"
+                android:button="@android:color/transparent"
+                android:background="@drawable/checkbutton"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="49dp"
+                android:clickable="true"
+                android:layout_alignParentBottom="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/Attd"
+                android:id="@+id/attendance"
+                android:layout_alignParentEnd="false"
+                android:layout_marginRight="10sp"
+                android:layout_alignStart="@+id/button"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="15sp" />
+            </RelativeLayout>
 
 
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
 
-        android:id="@+id/radioButton"
-        android:layout_alignBottom="@+id/midblock"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10sp"
-        android:checked="false"
-        android:button="@android:color/transparent"
-        android:background="@drawable/checkbutton" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/Attd"
-        android:id="@+id/attendance"
-        android:layout_alignParentEnd="false"
-        android:layout_marginRight="10sp"
-        android:layout_alignStart="@+id/radioButton"
-        android:layout_above="@+id/radioButton"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textAlignment="center" />
 
     <LinearLayout
         android:id="@+id/leftblock"
@@ -103,7 +111,7 @@
         android:layout_width="75sp"
         android:layout_height="75sp"
         android:layout_alignParentStart="false"
-        android:layout_alignBottom="@+id/radioButton"
+        android:layout_alignBottom="@+id/midblock"
         android:background="@drawable/shape"
         android:textAlignment="center"
         android:layout_marginLeft="15sp"

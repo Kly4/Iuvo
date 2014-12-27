@@ -14,6 +14,7 @@ public class Course extends RealmObject {
     private String instructor;
     private String title;
 
+
     public String getSubject() {
         return subject;
     }

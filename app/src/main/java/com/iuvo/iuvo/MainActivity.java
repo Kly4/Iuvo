@@ -1,27 +1,29 @@
 package com.iuvo.iuvo;
 
-import com.iuvo.iuvo.schemas.*;
-
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.iuvo.iuvo.schemas.Course;
+import com.iuvo.iuvo.schemas.Event;
 
 import java.util.HashMap;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+
+;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -70,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
         private final Context context;
         private final RealmResults<Event> values;
         private HashMap<Course, String> courseColors;
-        // private Realm realm;
+        private Realm realm;
 
 
         public CustomAdapter(Context context, RealmResults<Event> values) {
@@ -78,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
             this.context = context;
             this.values = values;
 
-            Realm realm = Realm.getInstance(context);
+            realm = Realm.getInstance(context);
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
             String[] colors = getResources().getStringArray(R.array.colors);
@@ -96,16 +98,18 @@ public class MainActivity extends ActionBarActivity {
             TextView subject;
             TextView code;
             TextView date;
-            RadioButton radio;
+            CheckBox checkbox;
             TextView attendance;
+            
 
-            public ViewHolder(View convertView) {
+            public ViewHolder(View convertView, int position) {
                 subject = (TextView) convertView.findViewById(R.id.classname);
                 code = (TextView) convertView.findViewById(R.id.classnumber);
                 date = (TextView) convertView.findViewById(R.id.date);
-
-                radio = (RadioButton) convertView.findViewById(R.id.radioButton);
+                checkbox = (CheckBox) convertView.findViewById(R.id.button);
                 attendance = (TextView) convertView.findViewById(R.id.attendance);
+                Event item = realmResults.get(position);
+                checkbox.setTag(item);
             }
         }
 
@@ -113,16 +117,36 @@ public class MainActivity extends ActionBarActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             ViewHolder view;
+            Event item = realmResults.get(position);
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
-                view = new ViewHolder(convertView);
+
+                view = new ViewHolder(convertView, position);
                 convertView.setTag(view);
+
+
+                view.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+                    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                        // checkedId is the RadioButton selected
+                        Log.v(TAG, "Clicked");
+                        realm.beginTransaction();
+                        Event item = (Event) button.getTag();
+                        if(isChecked){
+                            item.setNumAttendees(item.getNumAttendees() + 1);
+                        }
+                        else item.setNumAttendees(item.getNumAttendees() - 1);
+                        realm.commitTransaction();
+                       notifyDataSetChanged();
+                    }
+                });
+
             } else {
                 view = (ViewHolder) convertView.getTag();
             }
 
-            Event item = realmResults.get(position);
+
             Course course = item.getCourse();
             String color = courseColors.get(course);
             // TODO: Set the color background color for view.shape
