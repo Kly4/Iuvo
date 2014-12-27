@@ -1,6 +1,7 @@
 package com.iuvo.iuvo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -64,6 +65,8 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
+            Intent intent = new Intent(this, NewEvent.class);
+            startActivity(intent);
             return true;
         }
 
@@ -139,9 +142,11 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            Log.v(TAG, "getView");
 
             ViewHolder view;
             Event item = realmResults.get(position);
+            Course course = item.getCourse();
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
@@ -149,6 +154,8 @@ public class MainActivity extends ActionBarActivity {
                 view = new ViewHolder(convertView, position);
                 convertView.setTag(view);
 
+                String color = courseColors.get(course);
+                shape.setColor(Color.parseColor(color));
 
                 view.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -174,10 +181,6 @@ public class MainActivity extends ActionBarActivity {
                 view = (ViewHolder) convertView.getTag();
             }
 
-
-            Course course = item.getCourse();
-            String color = courseColors.get(course);
-            shape.setColor(Color.parseColor(color));
 
             view.timeAt.setText(item.getTimeAt());
             view.timeTill.setText(item.getTimeTill());

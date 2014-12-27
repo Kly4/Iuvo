@@ -68,8 +68,8 @@
     </LinearLayout>
 
             <CheckBox
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:tag=""
                 android:id="@+id/button"
                 android:layout_marginRight="20sp"
