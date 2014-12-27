@@ -1,8 +1,5 @@
 package com.iuvo.iuvo.schemas;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import io.realm.RealmObject;
 
 /**
@@ -13,6 +10,11 @@ public class Event extends RealmObject {
     private String title;
     private String description;
     private int numAttendees;
+    private boolean checkState;
+
+    public boolean isCheckState() { return checkState; }
+
+    public void setCheckState(boolean checkState) { this.checkState = checkState; }
 
     public Course getCourse() {
         return course;

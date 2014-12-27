@@ -100,7 +100,7 @@ public class MainActivity extends ActionBarActivity {
             TextView date;
             CheckBox checkbox;
             TextView attendance;
-            
+
 
             public ViewHolder(View convertView, int position) {
                 subject = (TextView) convertView.findViewById(R.id.classname);
@@ -110,6 +110,7 @@ public class MainActivity extends ActionBarActivity {
                 attendance = (TextView) convertView.findViewById(R.id.attendance);
                 Event item = realmResults.get(position);
                 checkbox.setTag(item);
+                checkbox.setChecked(item.isCheckState());
             }
         }
 
@@ -135,8 +136,12 @@ public class MainActivity extends ActionBarActivity {
                         Event item = (Event) button.getTag();
                         if(isChecked){
                             item.setNumAttendees(item.getNumAttendees() + 1);
+                            item.setCheckState(true);
                         }
-                        else item.setNumAttendees(item.getNumAttendees() - 1);
+                        else {
+                            item.setNumAttendees(item.getNumAttendees() - 1);
+                            item.setCheckState(false);
+                        }
                         realm.commitTransaction();
                        notifyDataSetChanged();
                     }
