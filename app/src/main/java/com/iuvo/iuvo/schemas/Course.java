@@ -1,9 +1,7 @@
 package com.iuvo.iuvo.schemas;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import io.realm.RealmObject;
+
 
 /**
 * Created by Dan on 2014-12-21.
