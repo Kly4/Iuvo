@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
         private static final String TAG = "CustomAdapter";
         private final Context context;
         private final RealmResults<Event> values;
-        private HashMap<Course, String> courseColors;
+        private HashMap<String, String> courseColors;
         private Realm realm;
         LinearLayout leftblock;
         GradientDrawable shape;
@@ -99,7 +99,9 @@ public class MainActivity extends ActionBarActivity {
 
             int i = 0;
             for (Course course : courses) {
-                courseColors.put(course, colors[i++ % colors.length]);
+                String code = course.getSubject()+course.getCourseCode();
+                if (courseColors.get(code) == null)
+                    courseColors.put(code, colors[i++ % colors.length]);
             }
 
             Log.v(TAG, "Launched with " + values.size() + " elements");
@@ -151,8 +153,12 @@ public class MainActivity extends ActionBarActivity {
                 view = new ViewHolder(convertView, position);
                 convertView.setTag(view);
 
-                String color = courseColors.get(course);
+                String color = courseColors.get(course.getSubject()+course.getCourseCode());
+                Log.v(TAG, "setting colour");
                 shape.setColor(Color.parseColor(color));
+                if(color == "#00C853"){
+                    Log.v(TAG, "green");
+                }
 
                 view.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
