@@ -1,27 +1,22 @@
 package com.iuvo.iuvo;
 
-import org.json.*;
-
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.util.Log;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import com.iuvo.iuvo.schemas.JSONSchema;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-
-import com.iuvo.iuvo.schemas.*;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by Dan on 2014-12-20.
  */
 public class LocalDB {
     private static final String TAG = "LocalDB";
+    public static boolean updated = false;
 
     /**
      * This will send an HTTP call to the remote server, requesting updates from the user's classes.
@@ -54,6 +49,7 @@ public class LocalDB {
             Log.v(TAG, "Creating " + json.length() + " new Events");
             for (int i = 0; i < json.length(); i++)
                 JSONSchema.createEvent(ctx, json.getJSONObject(i));
+            updated = true;
         }
         catch (JSONException | IOException ex) {
             Log.e(TAG, "Failed to update", ex);

@@ -42,7 +42,10 @@ public class MainActivity extends ActionBarActivity {
         Realm.deleteRealmFile(this);
         // This will produce duplicates in our current setup. I'll fix...
         Realm realm = Realm.getInstance(this);
-        LocalDB.update(this);
+        if(LocalDB.updated == false){
+            LocalDB.update(this);
+        }
+
 
 
         ListView view = (ListView) findViewById(R.id.event_list);
@@ -82,12 +85,6 @@ public class MainActivity extends ActionBarActivity {
         LinearLayout leftblock;
         GradientDrawable shape;
 
-
-//        View v = findViewById(R.id.layout_id);
-//
-//        LayerDrawable bgDrawable = (LayerDrawable)v.getBackground();
-//        final GradientDrawable shape = (GradientDrawable)   bgDrawable.findDrawableByLayerId(R.id.shape_id);
-//        shape.setColor(----);
 
 
         public CustomAdapter(Context context, RealmResults<Event> values) {
