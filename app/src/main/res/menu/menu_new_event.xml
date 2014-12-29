@@ -2,6 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context="com.iuvo.iuvo.NewEvent">
 
-    <item android:id="@+id/action_done" android:title="@string/action_done" android:icon="@drawable/ic_check_white_48dp"
+    <item android:id="@+id/action_done" android:title="@string/action_done" android:icon="@drawable/ic_check_circle_black_48dp"
         android:orderInCategory="100" app:showAsAction="always" />
 </menu>
