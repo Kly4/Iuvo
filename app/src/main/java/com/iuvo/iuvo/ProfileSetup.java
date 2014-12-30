@@ -2,12 +2,15 @@ package com.iuvo.iuvo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
@@ -26,25 +29,43 @@ public class ProfileSetup extends ActionBarActivity {
     Spinner spinner;
     AutoCompleteTextView pickClass;
     String[] universities = {"UMass-Amherst", "Utorronto"};
+    String[] course = {"CS 121", "ECE 211", "Bio 151", "CS240", "Phil 112"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
+
+        final Context context = this;
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
         spinner = (Spinner) findViewById(R.id.pickUniversity);
 
         realm = Realm.getInstance(this);
         result = realm.where(Course.class).findAll();
 
-        CustomAdapter courseAdapter = new CustomAdapter(this, result);
+        //CustomAdapter courseAdapter = new CustomAdapter(this, result);
+        ArrayAdapter<String> autoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, course );
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, universities);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        //pickClass.setAdapter(courseAdapter);
+        pickClass.setAdapter(autoAdapter);
+
+
+
+        pickClass.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                AutoCompleteTextView addClass = new AutoCompleteTextView(context);
+                addClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
+
+        }
+        });
 
     }
+
 
     class CustomAdapter extends RealmBaseAdapter<Course> {
         RealmResults<Course> values;
@@ -85,6 +106,11 @@ public class ProfileSetup extends ActionBarActivity {
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_done) {
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("University", spinner.getSelectedItem().toString());
+            editor.commit();
+
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             return true;

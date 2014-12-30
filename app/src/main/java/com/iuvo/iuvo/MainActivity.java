@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,20 +34,20 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // idk lol
-        Realm.deleteRealmFile(this);
         // This will produce duplicates in our current setup. I'll fix...
-        Realm realm = Realm.getInstance(this);
         if(LocalDB.updated == false){
+            // idk lol
+            Realm.deleteRealmFile(this);
             LocalDB.update(this);
         }
 
-
-
         ListView view = (ListView) findViewById(R.id.event_list);
+        Realm realm = Realm.getInstance(this);
         view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
     }
 
@@ -119,7 +118,6 @@ public class MainActivity extends ActionBarActivity {
             TextView attendance;
 
 
-
             public ViewHolder(View convertView, int position) {
                 subject = (TextView) convertView.findViewById(R.id.classname);
                 code = (TextView) convertView.findViewById(R.id.classnumber);
@@ -141,13 +139,13 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.v(TAG, "getView");
+            Log.v(TAG, "getView " + String.valueOf(position));
 
             ViewHolder view;
             Event item = realmResults.get(position);
             Course course = item.getCourse();
 
-            if (convertView == null) {
+            //if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_layout, parent, false);
 
                 view = new ViewHolder(convertView, position);
@@ -160,31 +158,29 @@ public class MainActivity extends ActionBarActivity {
                     Log.v(TAG, "green");
                 }
 
-                view.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//            } else {
+//                view = (ViewHolder) convertView.getTag();
+//            }
 
-                    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                        // checkedId is the RadioButton selected
-                        Log.v(TAG, "Clicked");
-                        realm.beginTransaction();
-                        Event item = (Event) button.getTag();
-                        if(isChecked){
-                            item.setNumAttendees(item.getNumAttendees() + 1);
-                            item.setCheckState(true);
-                        }
-                        else {
-                            item.setNumAttendees(item.getNumAttendees() - 1);
-                            item.setCheckState(false);
-                        }
-                        realm.commitTransaction();
-                       notifyDataSetChanged();
+            view.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                    // checkedId is the RadioButton selected
+                    Log.v(TAG, "Clicked");
+                    realm.beginTransaction();
+                    Event item = (Event) button.getTag();
+                    if(isChecked){
+                        item.setNumAttendees(item.getNumAttendees() + 1);
+                        item.setCheckState(true);
                     }
-                });
-
-            } else {
-                view = (ViewHolder) convertView.getTag();
-            }
-
-
+                    else {
+                        item.setNumAttendees(item.getNumAttendees() - 1);
+                        item.setCheckState(false);
+                    }
+                    realm.commitTransaction();
+                    notifyDataSetChanged();
+                }
+            });
             view.timeAt.setText(item.getTimeAt());
             view.timeTill.setText(item.getTimeTill());
             view.location.setText(item.getLocation());

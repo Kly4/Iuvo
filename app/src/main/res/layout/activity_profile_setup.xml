@@ -16,7 +16,7 @@
     <AutoCompleteTextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="New AutoCompleteTextView"
+        android:hint="Pick your class"
         android:id="@+id/autoCompleteClass"
         android:layout_below="@+id/pickUniversity"
         android:layout_alignParentStart="true" />
