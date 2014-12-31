@@ -28,27 +28,49 @@ public class JSONSchema {
     //private Realm realm;
     private Context ctx;
     private CourseDeserializer cd;
+    private EventDeserializer ed;
 
     public JSONSchema(Context ctx) {
         //realm = Realm.getInstance(ctx);
         this.ctx = ctx;
         cd = new CourseDeserializer();
+        ed = new EventDeserializer();
     }
 
     public CourseDeserializer getCourseDeserializer() {
         return cd;
     }
+    public EventDeserializer getEventDeserializer() { return ed; }
 
-    public class CourseDeserializer implements JsonDeserializer<Course> {
+    // Hack: Because RealmObjects cannot be passed across threads and networking necessarily uses
+    // them, we can at least pass the id of the created event or course.
+    public static class EventId {
+        public String id;
+        EventId(String id) {
+            this.id = id;
+        }
+    }
+    public static class CourseId {
+        public String id;
+        CourseId(String id) {
+            this.id = id;
+        }
+    }
+
+    public class CourseDeserializer implements JsonDeserializer<CourseId> {
         public static final String TAG = "CourseDeserializer";
 
         @Override
-        public Course deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
+        public CourseId deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
             Realm realm = Realm.getInstance(ctx);
             realm.beginTransaction();
             JsonObject json = jsonElement.getAsJsonObject();
 
             Course course = realm.createObject(Course.class);
+
+            CourseId cid = new CourseId(json.get("_id").getAsString());
+            course.setId(cid.id);
+
             course.setSubject(json.get("subject").getAsString());
             course.setCode(json.get("code").getAsString());
             course.setInstructor(json.get("instructor").getAsString());
@@ -56,7 +78,8 @@ public class JSONSchema {
 
             realm.commitTransaction();
             Log.v(TAG, "Created Course in realm: " + course.getTitle());
-            return course;
+            realm.close();
+            return cid;
 //            try {
 //            } catch (Exception ex) {
 //                realm.cancelTransaction();
@@ -67,39 +90,40 @@ public class JSONSchema {
         }
     }
 
-    public class EventDeserializer implements JsonDeserializer<Event> {
+    public class EventDeserializer implements JsonDeserializer<EventId> {
         public static final String TAG = "EventDeserializer";
 
         @Override
-        public Event deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
+        public EventId deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
             Log.v(TAG, "Initiated");
 
             Realm realm = Realm.getInstance(ctx);
             realm.beginTransaction();
             JsonObject json = jsonElement.getAsJsonObject();
 
-            try {
-                Event event = realm.createObject(Event.class);
-                event.setCourse(null);
+            Event event = realm.createObject(Event.class);
+            EventId eid = new EventId(json.get("_id").getAsString());
+            event.setId(eid.id);
 
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                event.setStartTime(df.parse(json.get("start_time").getAsString()));
-                event.setEndTime(df.parse(json.get("end_time").getAsString()));
+            try {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                event.setStartTime(df.parse(json.get("start_date").getAsString()));
+                event.setEndTime(df.parse(json.get("end_date").getAsString()));
 
                 event.setDescription(json.get("description").getAsString());
                 event.setLocation(json.get("location").getAsString());
                 event.setNumAttendees(json.get("num_attendees").getAsInt());
                 realm.commitTransaction();
 
-                Log.v(TAG, "Created Event in realm");
-                return event;
+                Log.v(TAG, "Created Event in realm: " + event.getId());
 
             } catch (ParseException ex) {
                 realm.cancelTransaction();
                 Log.e(TAG, "Failed to create Event ", ex);
                 Log.e(TAG, jsonElement.toString());
-                return null;
             }
+            realm.close();
+            return eid;
         }
     }
 

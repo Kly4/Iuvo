@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class LocalDB {
     private static final String TAG = "LocalDB";
     private static final String SERVER = "http://ec2-54-173-210-203.compute-1.amazonaws.com";
 
-    public interface IuvoServer {
 
+    public interface IuvoServer {
         /**
          * @return A list of all schools in the database
          */
@@ -45,7 +46,7 @@ public class LocalDB {
          * @return A list of course info (namely a the subject and course code)
          */
         @GET("/courses/{school}")
-        void getCourseList(@Path("school") String school, Callback<List<Course>> courses);
+        void getCourseList(@Path("school") String school, Callback<List<JSONSchema.CourseId>> courses);
 
         /**
          * @param school
@@ -69,7 +70,7 @@ public class LocalDB {
         void getEventList(@Path("school") String school,
                           @Path("subject") String subject,
                           @Path("code") String code,
-                          Callback<List<Event>> eventList);
+                          Callback<List<JSONSchema.EventId>> eventList);
 
         @POST("/events/new")
         void createEvent(@Body Event event, Callback<Event> cb);
@@ -87,7 +88,8 @@ public class LocalDB {
 
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(Course.class, schema.getCourseDeserializer())
+                .registerTypeAdapter(JSONSchema.CourseId.class, schema.getCourseDeserializer())
+                .registerTypeAdapter(JSONSchema.EventId.class, schema.getEventDeserializer())
                 .create();
 
         restAdapter = new RestAdapter.Builder()
@@ -118,33 +120,45 @@ public class LocalDB {
             final String school = course.getSchool();
             final String subject = course.getSubject();
             final String code = course.getCode();
-
+            final String id = course.getId();
             Log.v(TAG, "Getting /events/"+school+"/"+subject+"/"+code);
-            server.getEventList(school, subject, code, new Cb<List<Event>>() {
+
+            server.getEventList(school, subject, code, new Cb<List<JSONSchema.EventId>>() {
                 @Override
-                public void success(List<Event> events, Response response) {
+                public void success(List<JSONSchema.EventId> events, Response response) {
                     Realm realm = Realm.getInstance(ctx);
-                    for (Event event : events) {
-                        realm.beginTransaction();
-                        // Unfortunately, necessary because the previous course
-                        // object is in another thread.
-                        Course course = realm.where(Course.class)
-                                             .equalTo("school", school)
-                                             .equalTo("subject", subject)
-                                             .equalTo("code", code)
-                                             .findFirst();
+                    Course course = realm.where(Course.class)
+                            .equalTo("id", id)
+                            .findFirst();
+
+                    realm.beginTransaction();
+                    for (JSONSchema.EventId eventId : events) {
+                        Log.v(TAG, "Getting event " + eventId.id);
+                        Log.v(TAG, "All events I can see:");
+                        for(Event e : realm.where(Event.class).findAll()) {
+                            Log.v(TAG, "Event " + e.getId());
+                        }
+
+                        Event event = realm.where(Event.class)
+                                .equalTo("id", eventId.id)
+                                .findFirst();
+                        Log.v(TAG, "Course: " + String.valueOf(course != null));
+                        Log.v(TAG, "Event: " + String.valueOf(event != null));
                         event.setCourse(course);
-                        realm.commitTransaction();
                     }
+                    realm.commitTransaction();
+
+                    realm.close();
                 }
             });
         }
+        realm.close();
     }
 
     public void getCourses(final String school) {
-        server.getCourseList(school, new Cb<List<Course>>() {
+        server.getCourseList(school, new Cb<List<JSONSchema.CourseId>>() {
             @Override
-            public void success(List<Course> courseResults, Response response) {
+            public void success(List<JSONSchema.CourseId> courseResults, Response response) {
                 Realm realm = Realm.getInstance(ctx);
                 RealmResults<Course> courses = realm.where(Course.class).findAll();
 
@@ -155,29 +169,12 @@ public class LocalDB {
                     courses.get(i).setSchool(school);
                 }
                 realm.commitTransaction();
-
+                realm.close();
                 getEvents();
             }
         });
     }
 
-    //            @Override
-//            public void success(List<JSONObject> list, Response response) {
-//                Log.v(TAG, "getCourses onSuccess");
-//                try {
-//                    for (JSONObject obj : list) {
-//                        Course course = JSONSchema.createCourse(ctx, obj);
-//                        getEvents(ctx, course);
-//                    }
-////                    for (int i = 0; i < jsonArray.length(); i++) {
-////                        Course course = JSONSchema.createCourse(ctx, (JSONObject) jsonArray.get(i));
-////                        getEvents(ctx, course);
-////                    }
-//                }
-//                catch (Exception ex) {
-//                    Log.v(TAG, "List accessed out of bounds", ex);
-//                }
-//            }
 
     // TODO: Consolidate HTTP calls - we make O(n) calls, n = number of courses
     /**

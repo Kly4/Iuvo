@@ -9,11 +9,21 @@ import io.realm.RealmObject;
 * Created by Dan on 2014-12-21.
 */
 public class Course extends RealmObject {
+
     private String school;
     private String subject;
     private String code;
     private String instructor;
     private String title;
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
 
     public String getSchool() {
