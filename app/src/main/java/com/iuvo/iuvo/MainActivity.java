@@ -27,6 +27,7 @@ import java.util.HashMap;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 
@@ -47,7 +48,15 @@ public class MainActivity extends ActionBarActivity {
 
 
         ListView view = (ListView) findViewById(R.id.event_list);
-        view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
+        final CustomAdapter adapter = new CustomAdapter(this, realm.where(Event.class).findAll());
+        view.setAdapter(adapter);
+
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override

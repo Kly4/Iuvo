@@ -3,6 +3,7 @@ package com.iuvo.iuvo.schemas;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -44,10 +45,10 @@ public class JSONSchema {
 
     // Hack: Because RealmObjects cannot be passed across threads and networking necessarily uses
     // them, we can at least pass the id of the created event or course.
-    public static class EventId {
-        public String id;
-        EventId(String id) {
-            this.id = id;
+    public static class EventIds {
+        public String[] ids;
+        EventIds(String[] ids) {
+            this.ids = ids;
         }
     }
     public static class CourseId {
@@ -90,40 +91,48 @@ public class JSONSchema {
         }
     }
 
-    public class EventDeserializer implements JsonDeserializer<EventId> {
+    public class EventDeserializer implements JsonDeserializer<EventIds> {
         public static final String TAG = "EventDeserializer";
 
         @Override
-        public EventId deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
+        public EventIds deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
+            // SHOULD BE CALLED WITH AN ARRAY OF EVENTS (UNLIKE CourseDeserializer ABOVE)
             Log.v(TAG, "Initiated");
 
             Realm realm = Realm.getInstance(ctx);
             realm.beginTransaction();
-            JsonObject json = jsonElement.getAsJsonObject();
-
-            Event event = realm.createObject(Event.class);
-            EventId eid = new EventId(json.get("_id").getAsString());
-            event.setId(eid.id);
+            JsonArray jsonArray = jsonElement.getAsJsonArray();
+            String[] ids = new String[jsonArray.size()];
 
             try {
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                event.setStartTime(df.parse(json.get("start_date").getAsString()));
-                event.setEndTime(df.parse(json.get("end_date").getAsString()));
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject json = jsonArray.get(i).getAsJsonObject();
 
-                event.setDescription(json.get("description").getAsString());
-                event.setLocation(json.get("location").getAsString());
-                event.setNumAttendees(json.get("num_attendees").getAsInt());
+                    Event event = realm.createObject(Event.class);
+                    ids[i] = json.get("_id").getAsString();
+                    event.setId(ids[i]);
+
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    event.setStartTime(df.parse(json.get("start_date").getAsString()));
+                    event.setEndTime(df.parse(json.get("end_date").getAsString()));
+
+                    event.setDescription(json.get("description").getAsString());
+                    event.setLocation(json.get("location").getAsString());
+                    event.setNumAttendees(json.get("num_attendees").getAsInt());
+
+                    Log.v(TAG, "Created Event in realm: " + event.getId());
+                }
+
                 realm.commitTransaction();
-
-                Log.v(TAG, "Created Event in realm: " + event.getId());
+                Log.v(TAG, "...committed.");
 
             } catch (ParseException ex) {
                 realm.cancelTransaction();
-                Log.e(TAG, "Failed to create Event ", ex);
+                Log.e(TAG, "Failed to create all the above Events ", ex);
                 Log.e(TAG, jsonElement.toString());
             }
             realm.close();
-            return eid;
+            return new EventIds(ids);
         }
     }
 

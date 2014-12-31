@@ -70,7 +70,7 @@ public class LocalDB {
         void getEventList(@Path("school") String school,
                           @Path("subject") String subject,
                           @Path("code") String code,
-                          Callback<List<JSONSchema.EventId>> eventList);
+                          Callback<JSONSchema.EventIds> eventList);
 
         @POST("/events/new")
         void createEvent(@Body Event event, Callback<Event> cb);
@@ -89,7 +89,7 @@ public class LocalDB {
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(JSONSchema.CourseId.class, schema.getCourseDeserializer())
-                .registerTypeAdapter(JSONSchema.EventId.class, schema.getEventDeserializer())
+                .registerTypeAdapter(JSONSchema.EventIds.class, schema.getEventDeserializer())
                 .create();
 
         restAdapter = new RestAdapter.Builder()
@@ -104,7 +104,7 @@ public class LocalDB {
         public void failure(RetrofitError error) {
             Log.v(TAG, "Retrofit Callback failure:");
             if (error.getResponse() == null)
-                Log.v(TAG, "Error of type " + error.getKind(), error.getCause());
+                Log.v(TAG, "Error of type " + error.getKind() + " " + error.getCause().getClass());
             else
                 Log.v(TAG,
                         error.getResponse().getReason() + " " +
@@ -114,39 +114,51 @@ public class LocalDB {
     }
 
     public void getEvents() {
+        Log.v(TAG, "getEvents");
         Realm realm = Realm.getInstance(ctx);
+
         RealmResults<Course> courses = realm.where(Course.class).findAll();
         for (Course course : courses) {
+
             final String school = course.getSchool();
             final String subject = course.getSubject();
             final String code = course.getCode();
             final String id = course.getId();
             Log.v(TAG, "Getting /events/"+school+"/"+subject+"/"+code);
 
-            server.getEventList(school, subject, code, new Cb<List<JSONSchema.EventId>>() {
+
+            server.getEventList(school, subject, code, new Cb<JSONSchema.EventIds>() {
                 @Override
-                public void success(List<JSONSchema.EventId> events, Response response) {
+                public void success(JSONSchema.EventIds events, Response response) {
                     Realm realm = Realm.getInstance(ctx);
+
                     Course course = realm.where(Course.class)
                             .equalTo("id", id)
                             .findFirst();
 
                     realm.beginTransaction();
-                    for (JSONSchema.EventId eventId : events) {
-                        Log.v(TAG, "Getting event " + eventId.id);
-                        Log.v(TAG, "All events I can see:");
-                        for(Event e : realm.where(Event.class).findAll()) {
-                            Log.v(TAG, "Event " + e.getId());
-                        }
+                    try {
+                        for (String eventId : events.ids) {
+                            Log.v(TAG, "Getting event " + eventId);
+                            Log.v(TAG, "All events I can see:");
+                            for (Event e : realm.where(Event.class).findAll()) {
+                                Log.v(TAG, "Event " + e.getId());
+                            }
 
-                        Event event = realm.where(Event.class)
-                                .equalTo("id", eventId.id)
-                                .findFirst();
-                        Log.v(TAG, "Course: " + String.valueOf(course != null));
-                        Log.v(TAG, "Event: " + String.valueOf(event != null));
-                        event.setCourse(course);
+                            Event event = realm.where(Event.class)
+                                    .equalTo("id", eventId)
+                                    .findFirst();
+
+                            Log.v(TAG, "Course: " + String.valueOf(course != null));
+                            Log.v(TAG, "Event: " + String.valueOf(event != null));
+
+                            event.setCourse(course);
+                        }
+                        realm.commitTransaction();
                     }
-                    realm.commitTransaction();
+                    catch (Exception ex) {
+                        Log.e(TAG, "Could not update event list", ex);
+                    }
 
                     realm.close();
                 }
