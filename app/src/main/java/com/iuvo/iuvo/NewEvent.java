@@ -107,6 +107,7 @@ public class NewEvent extends ActionBarActivity {
             newEvent.setDescription(note.getText().toString());
             realm.commitTransaction();
             startActivity(intent);
+            finish();
 
             return true;
         }

@@ -1,9 +1,11 @@
 package com.iuvo.iuvo;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,12 +33,31 @@ public class ProfileSetup extends ActionBarActivity {
     String[] universities = {"UMass-Amherst", "Utorronto"};
     String[] course = {"CS 121", "ECE 211", "Bio 151", "CS240", "Phil 112"};
 
+    SharedPreferences mPrefs;
+    final String welcomeScreenShownPref = "welcomeScreenShown";
+    public ProgressDialog myDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
+
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // second argument is the default to use if the preference can't be found
+        Boolean welcomeScreenShown = mPrefs.getBoolean(welcomeScreenShownPref, false);
+
+        if(welcomeScreenShown){
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putBoolean(welcomeScreenShownPref, true);
+        editor.commit();
 
         final Context context = this;
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);

@@ -2,9 +2,11 @@ package com.iuvo.iuvo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -31,24 +33,40 @@ import io.realm.RealmResults;
 
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = "MainActivity";
+    SharedPreferences mPrefs;
+    final String LocalDbUpdate = "updated";
+    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        realm = Realm.getInstance(this);
 
-        // This will produce duplicates in our current setup. I'll fix...
-        if(LocalDB.updated == false){
+        // second argument is the default to use if the preference can't be found
+        Boolean LocalDbUpdated = mPrefs.getBoolean(LocalDbUpdate, false);
+
+
+        if(!LocalDbUpdated){
             // idk lol
             Realm.deleteRealmFile(this);
             LocalDB.update(this);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putBoolean(LocalDbUpdate, true);
+            editor.commit();
         }
 
         ListView view = (ListView) findViewById(R.id.event_list);
-        Realm realm = Realm.getInstance(this);
+
         view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        realm.close();
     }
 
     @Override
@@ -69,6 +87,7 @@ public class MainActivity extends ActionBarActivity {
         if (id == R.id.action_add) {
             Intent intent = new Intent(this, NewEvent.class);
             startActivity(intent);
+            finish();
             return true;
         }
 
@@ -80,7 +99,6 @@ public class MainActivity extends ActionBarActivity {
         private final Context context;
         private final RealmResults<Event> values;
         private HashMap<String, String> courseColors;
-        private Realm realm;
         LinearLayout leftblock;
         GradientDrawable shape;
 
@@ -91,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
             this.context = context;
             this.values = values;
 
-            realm = Realm.getInstance(context);
+
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
             String[] colors = getResources().getStringArray(R.array.colors);
