@@ -1,2 +1,1 @@
-include ':app', ':facebook', ':fb'
-project(':fb').projectDir = new File('facebook')
+include ':app'
