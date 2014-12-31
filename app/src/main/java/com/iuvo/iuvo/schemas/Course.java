@@ -9,11 +9,20 @@ import io.realm.RealmObject;
 * Created by Dan on 2014-12-21.
 */
 public class Course extends RealmObject {
+    private String school;
     private String subject;
-    private String courseCode;
+    private String code;
     private String instructor;
     private String title;
 
+
+    public String getSchool() {
+        return school;
+    }
+
+    public void setSchool(String school) {
+        this.school = school;
+    }
 
     public String getSubject() {
         return subject;
@@ -23,12 +32,12 @@ public class Course extends RealmObject {
         this.subject = subject;
     }
 
-    public String getCourseCode() {
-        return courseCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setCode(String courseCode) {
+        this.code = code;
     }
 
     public String getInstructor() {

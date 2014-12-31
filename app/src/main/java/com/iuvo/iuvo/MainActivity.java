@@ -21,13 +21,14 @@ import android.widget.TextView;
 import com.iuvo.iuvo.schemas.Course;
 import com.iuvo.iuvo.schemas.Event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -42,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
         Realm.deleteRealmFile(this);
         // This will produce duplicates in our current setup. I'll fix...
         Realm realm = Realm.getInstance(this);
-        LocalDB.update(this);
+        (new LocalDB(this)).update(this);
 
 
         ListView view = (ListView) findViewById(R.id.event_list);
@@ -135,8 +136,6 @@ public class MainActivity extends ActionBarActivity {
                 checkbox.setChecked(item.isCheckState());
                 leftblock = (LinearLayout) convertView.findViewById(R.id.leftblock);
                 shape = (GradientDrawable) leftblock.getBackground();
-
-
             }
         }
 
@@ -182,12 +181,20 @@ public class MainActivity extends ActionBarActivity {
             }
 
 
-            view.timeAt.setText(item.getTimeAt());
-            view.timeTill.setText(item.getTimeTill());
+
+            // Should produce: "12:13 PM"
+            DateFormat time = new SimpleDateFormat("hh:mm a");
+            view.timeAt.setText(time.format(item.getStartTime()));
+            view.timeTill.setText(time.format(item.getEndTime()));
+
             view.location.setText(item.getLocation());
             view.subject.setText(course.getSubject());
-            view.code.setText(course.getCourseCode());
-            view.date.setText("Dec 21");
+            view.code.setText(course.getCode());
+
+            // Should produce: "Jul 4"
+            DateFormat date = new SimpleDateFormat("MMM d");
+            view.date.setText(date.format(item.getStartTime()));
+
             view.attendance.setText(String.valueOf(item.getNumAttendees()));
 
             return convertView;

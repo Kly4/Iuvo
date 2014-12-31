@@ -1,5 +1,7 @@
 package com.iuvo.iuvo.schemas;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 
 /**
@@ -7,30 +9,33 @@ import io.realm.RealmObject;
 */
 public class Event extends RealmObject {
     private Course course;
-    private String title;
+
     private String description;
+    private String location;
+
     private int numAttendees;
     private boolean checkState;
 
-    private String timeAt;
-    private String timeTill;
-    private String location;
+    private Date startTime;
+    private Date endTime;
 
-    public String getTimeAt() {
-        return timeAt;
+
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setTimeAt(String timeAt) {
-        this.timeAt = timeAt;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public String getTimeTill() {
-        return timeTill;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setTimeTill(String timeTill) {
-        this.timeTill = timeTill;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
+
 
     public String getLocation() {
         return location;
@@ -50,14 +55,6 @@ public class Event extends RealmObject {
 
     public void setCourse(Course course) {
         this.course = course;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {
