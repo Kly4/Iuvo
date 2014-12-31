@@ -22,13 +22,15 @@ import android.widget.TextView;
 import com.iuvo.iuvo.schemas.Course;
 import com.iuvo.iuvo.schemas.Event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -48,19 +50,25 @@ public class MainActivity extends ActionBarActivity {
         // second argument is the default to use if the preference can't be found
         Boolean LocalDbUpdated = mPrefs.getBoolean(LocalDbUpdate, false);
 
-
         if(!LocalDbUpdated){
             // idk lol
             Realm.deleteRealmFile(this);
-            LocalDB.update(this);
+            (new LocalDB(this)).update(this);
             SharedPreferences.Editor editor = mPrefs.edit();
             editor.putBoolean(LocalDbUpdate, true);
             editor.commit();
         }
 
         ListView view = (ListView) findViewById(R.id.event_list);
+        final CustomAdapter adapter = new CustomAdapter(this, realm.where(Event.class).findAll());
+        view.setAdapter(adapter);
 
-        view.setAdapter(new CustomAdapter(this, realm.where(Event.class).findAll()));
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -102,6 +110,8 @@ public class MainActivity extends ActionBarActivity {
         LinearLayout leftblock;
         GradientDrawable shape;
 
+        String[] colors;
+        int colorCount;
 
 
         public CustomAdapter(Context context, RealmResults<Event> values) {
@@ -112,13 +122,13 @@ public class MainActivity extends ActionBarActivity {
 
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
-            String[] colors = getResources().getStringArray(R.array.colors);
+            colors = getResources().getStringArray(R.array.colors);
 
-            int i = 0;
+            colorCount = 0;
             for (Course course : courses) {
-                String code = course.getSubject()+course.getCourseCode();
-                if (courseColors.get(code) == null)
-                    courseColors.put(code, colors[i++ % colors.length]);
+                String courseCode = course.getSubject()+course.getCode();
+                if (courseColors.get(courseCode) == null)
+                    courseColors.put(courseCode, colors[colorCount++ % colors.length]);
             }
 
             Log.v(TAG, "Launched with " + values.size() + " elements");
@@ -150,8 +160,6 @@ public class MainActivity extends ActionBarActivity {
                 checkbox.setChecked(item.isCheckState());
                 leftblock = (LinearLayout) convertView.findViewById(R.id.leftblock);
                 shape = (GradientDrawable) leftblock.getBackground();
-
-
             }
         }
 
@@ -164,21 +172,24 @@ public class MainActivity extends ActionBarActivity {
             Course course = item.getCourse();
 
             //if (convertView == null) {
-                convertView = inflater.inflate(R.layout.row_layout, parent, false);
+            convertView = inflater.inflate(R.layout.row_layout, parent, false);
 
-                view = new ViewHolder(convertView, position);
-                convertView.setTag(view);
+            view = new ViewHolder(convertView, position);
+            convertView.setTag(view);
 
-                String color = courseColors.get(course.getSubject()+course.getCourseCode());
-                Log.v(TAG, "setting colour");
-                shape.setColor(Color.parseColor(color));
-                if(color == "#00C853"){
-                    Log.v(TAG, "green");
-                }
+            String courseCode = course.getSubject() + course.getCode();
+            String color = courseColors.get(courseCode);
+            // This course does not already have a color mapping
+            if (color == null) {
+                color = colors[colorCount++ % colors.length];
+                courseColors.put(courseCode, color);
+            }
+            shape.setColor(Color.parseColor(color));
 
-//            } else {
-//                view = (ViewHolder) convertView.getTag();
-//            }
+//          } else {
+//              view = (ViewHolder) convertView.getTag();
+//          }
+
 
             view.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -199,12 +210,21 @@ public class MainActivity extends ActionBarActivity {
                     notifyDataSetChanged();
                 }
             });
-            view.timeAt.setText(item.getTimeAt());
-            view.timeTill.setText(item.getTimeTill());
+
+
+            // Should produce: "12:13 PM"
+            DateFormat time = new SimpleDateFormat("hh:mm a");
+            view.timeAt.setText(time.format(item.getStartTime()));
+            view.timeTill.setText(time.format(item.getEndTime()));
+
             view.location.setText(item.getLocation());
             view.subject.setText(course.getSubject());
-            view.code.setText(course.getCourseCode());
-            view.date.setText("Dec 21");
+            view.code.setText(course.getCode());
+
+            // Should produce: "Jul 4"
+            DateFormat date = new SimpleDateFormat("MMM d");
+            view.date.setText(date.format(item.getStartTime()));
+
             view.attendance.setText(String.valueOf(item.getNumAttendees()));
 
             return convertView;
