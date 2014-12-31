@@ -103,7 +103,7 @@ public class ProfileSetup extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             String subject = values.get(position).getSubject();
-            String code = values.get(position).getCourseCode();
+            String code = values.get(position).getCode();
             convertView = inflater.inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
             TextView txt = (TextView) convertView.findViewById(android.R.id.text1);
             txt.setText(subject + code);

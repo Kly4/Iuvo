@@ -70,7 +70,7 @@ public class NewEvent extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             String subject = values.get(position).getSubject();
-            String code = values.get(position).getCourseCode();
+            String code = values.get(position).getCode();
             convertView = inflater.inflate(android.R.layout.simple_spinner_item, parent, false);
             TextView txt = (TextView) convertView.findViewById(android.R.id.text1);
             txt.setText(subject + code);
@@ -102,7 +102,7 @@ public class NewEvent extends ActionBarActivity {
             newEvent.setCourse(selectedCourse);
             newEvent.setNumAttendees(newEvent.getNumAttendees() + 1);
             newEvent.setCheckState(true);
-            newEvent.setTimeAt(time.getText().toString());
+//            newEvent.setTimeAt(time.getText().toString());
             newEvent.setLocation(location.getText().toString());
             newEvent.setDescription(note.getText().toString());
             realm.commitTransaction();
