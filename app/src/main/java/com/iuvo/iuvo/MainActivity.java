@@ -92,6 +92,8 @@ public class MainActivity extends ActionBarActivity {
         LinearLayout leftblock;
         GradientDrawable shape;
 
+        String[] colors;
+        int colorCount;
 
 //        View v = findViewById(R.id.layout_id);
 //
@@ -108,11 +110,11 @@ public class MainActivity extends ActionBarActivity {
             realm = Realm.getInstance(context);
             RealmResults<Course> courses = realm.where(Course.class).findAll();
             courseColors = new HashMap<>();
-            String[] colors = getResources().getStringArray(R.array.colors);
+            colors = getResources().getStringArray(R.array.colors);
 
-            int i = 0;
+            colorCount = 0;
             for (Course course : courses) {
-                courseColors.put(course, colors[i++ % colors.length]);
+                courseColors.put(course, colors[colorCount++ % colors.length]);
             }
 
             Log.v(TAG, "Launched with " + values.size() + " elements");
@@ -163,6 +165,10 @@ public class MainActivity extends ActionBarActivity {
                 convertView.setTag(view);
 
                 String color = courseColors.get(course);
+                if (color == null) {
+                    color = colors[colorCount++ % colors.length];
+                    courseColors.put(course, color);
+                }
                 shape.setColor(Color.parseColor(color));
 
                 view.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
