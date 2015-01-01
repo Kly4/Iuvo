@@ -174,11 +174,17 @@ public class ProfileSetup extends ActionBarActivity {
         protected Void doInBackground(Course... courses) {
             super.doInBackground(courses);
 
+            Realm realm = null;
             try {
-                Realm realm = Realm.getInstance(context);
+                realm = Realm.getInstance(context);
                 for (Course c : realm.allObjects(Course.class)) {
                     Log.v(TAG, c.getSchool()+"/"+c.getSubject()+"/"+c.getCode());
-                    getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
+                    Event[] events = getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
+
+                    realm.beginTransaction();
+                    for (Event e : events)
+                        e.setCourse(c);
+                    realm.commitTransaction();
                 }
                 return null;
             }
@@ -193,7 +199,7 @@ public class ProfileSetup extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
-
+        Realm.deleteRealmFile(this);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // second argument is the default to use if the preference can't be found
@@ -286,7 +292,6 @@ public class ProfileSetup extends ActionBarActivity {
     public void onDestroy(){
         super.onDestroy();
         Log.v(TAG, "onDestroy");
-        realm.close();
     }
 
 
