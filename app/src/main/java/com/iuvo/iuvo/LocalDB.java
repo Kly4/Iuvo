@@ -27,54 +27,6 @@ import retrofit.http.*;
  */
 public class LocalDB {
     private static final String TAG = "LocalDB";
-    private static final String SERVER = "http://ec2-54-173-210-203.compute-1.amazonaws.com";
-
-
-    public interface IuvoServer {
-        /**
-         * @return A list of all schools in the database
-         */
-        @GET("/schools")
-        void getSchools(Callback<List<String>> schools);
-
-
-        /**
-         * @param school
-         * @return A list of course info (namely a the subject and course code)
-         */
-        @GET("/courses/{school}")
-        void getCourseList(@Path("school") String school, Callback<JSONSchema.CourseIds> courses);
-
-//        /**
-//         * @param school
-//         * @param subject
-//         * @param code
-//         * @return Extra information (instructor, course title) to make a Course object
-//         */
-//        @GET("/events/{school}/{subject}/{code}")
-//        void getCourse(@Path("school") String school,
-//                       @Path("subject") String subject,
-//                       @Path("code") String code,
-//                       Callback<JSONObject> courseInfo);
-
-        /**
-         * @param school
-         * @param subject
-         * @param code
-         * @return Study sessions pertaining to the course
-         */
-        @GET("/events/{school}/{subject}/{code}")
-        void getEventList(@Path("school") String school,
-                          @Path("subject") String subject,
-                          @Path("code") String code,
-                          Callback<JSONSchema.EventIds> eventList);
-
-//        @POST("/events/new")
-//        void createEvent(@Body Event event, Callback<Event> cb);
-    }
-
-    final IuvoServer server;
-    final RestAdapter restAdapter;
     private Context ctx;
 
 
@@ -83,17 +35,6 @@ public class LocalDB {
 
         JSONSchema schema = new JSONSchema(ctx);
 
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(JSONSchema.CourseIds.class, schema.getCourseDeserializer())
-                .registerTypeAdapter(JSONSchema.EventIds.class, schema.getEventDeserializer())
-                .create();
-
-        restAdapter = new RestAdapter.Builder()
-                .setEndpoint(SERVER)
-                .setConverter(new GsonConverter(gson))
-                .build();
-        server = restAdapter.create(IuvoServer.class);
     }
 
     static abstract class Cb<T> implements Callback<T> {
@@ -109,81 +50,81 @@ public class LocalDB {
                         error.getResponse().getBody());
         }
     }
-
-    public void getEvents() {
-        Log.v(TAG, "getEvents");
-        Realm realm = Realm.getInstance(ctx);
-        RealmResults<Course> courses = realm.where(Course.class).findAll();
-        for (Course course : courses) {
-
-            final String school = course.getSchool();
-            final String subject = course.getSubject();
-            final String code = course.getCode();
-            final String id = course.getId();
-            Log.v(TAG, "Getting /events/"+school+"/"+subject+"/"+code);
-
-
-            server.getEventList(school, subject, code, new Cb<JSONSchema.EventIds>() {
-                @Override
-                public void success(JSONSchema.EventIds events, Response response) {
-                    Realm realm = Realm.getInstance(ctx);
-
-                    Course course = realm.where(Course.class)
-                            .equalTo("id", id)
-                            .findFirst();
-
-                    realm.beginTransaction();
-                    try {
-                        for (String eventId : events.ids) {
-                            Log.v(TAG, "Getting event " + eventId);
-                            Log.v(TAG, "All events I can see:");
-                            for (Event e : realm.where(Event.class).findAll()) {
-                                Log.v(TAG, "Event " + e.getId());
-                            }
-
-                            Event event = realm.where(Event.class)
-                                    .equalTo("id", eventId)
-                                    .findFirst();
-
-                            Log.v(TAG, "Course: " + String.valueOf(course != null));
-                            Log.v(TAG, "Event: " + String.valueOf(event != null));
-
-                            event.setCourse(course);
-                        }
-                        realm.commitTransaction();
-                    }
-                    catch (Exception ex) {
-                        Log.e(TAG, "Could not update event list", ex);
-                    }
-
-                    realm.close();
-                }
-            });
-        }
-        realm.close();
-    }
-
-    public void getCourses(final String school) {
-        server.getCourseList(school, new Cb<JSONSchema.CourseIds>() {
-            @Override
-            public void success(JSONSchema.CourseIds courseResults, Response response) {
-                Realm realm = Realm.getInstance(ctx);
-                RealmResults<Course> courses = realm.allObjects(Course.class);
-
-                // Unfortunately necessary because the previous course
-                // object is in another thread.
-                realm.beginTransaction();
-                Log.v(TAG, "Setting school for " + courses.size() + " Courses");
-                Log.v(TAG, "Supposed to have " + courseResults.ids.length + " Courses");
-                for (int i = 0; i < courses.size(); i++) {
-                    courses.get(i).setSchool(school);
-                }
-                realm.commitTransaction();
-                realm.close();
-                getEvents();
-            }
-        });
-    }
+//
+//    public void getEvents() {
+//        Log.v(TAG, "getEvents");
+//        Realm realm = Realm.getInstance(ctx);
+//        RealmResults<Course> courses = realm.where(Course.class).findAll();
+//        for (Course course : courses) {
+//
+//            final String school = course.getSchool();
+//            final String subject = course.getSubject();
+//            final String code = course.getCode();
+//            final String id = course.getId();
+//            Log.v(TAG, "Getting /events/"+school+"/"+subject+"/"+code);
+//
+//
+//            server.getEventList(school, subject, code, new Cb<JSONSchema.EventIds>() {
+//                @Override
+//                public void success(JSONSchema.EventIds events, Response response) {
+//                    Realm realm = Realm.getInstance(ctx);
+//
+//                    Course course = realm.where(Course.class)
+//                            .equalTo("id", id)
+//                            .findFirst();
+//
+//                    realm.beginTransaction();
+//                    try {
+//                        for (String eventId : events.ids) {
+//                            Log.v(TAG, "Getting event " + eventId);
+//                            Log.v(TAG, "All events I can see:");
+//                            for (Event e : realm.where(Event.class).findAll()) {
+//                                Log.v(TAG, "Event " + e.getId());
+//                            }
+//
+//                            Event event = realm.where(Event.class)
+//                                    .equalTo("id", eventId)
+//                                    .findFirst();
+//
+//                            Log.v(TAG, "Course: " + String.valueOf(course != null));
+//                            Log.v(TAG, "Event: " + String.valueOf(event != null));
+//
+//                            event.setCourse(course);
+//                        }
+//                        realm.commitTransaction();
+//                    }
+//                    catch (Exception ex) {
+//                        Log.e(TAG, "Could not update event list", ex);
+//                    }
+//
+//                    realm.close();
+//                }
+//            });
+//        }
+//        realm.close();
+//    }
+//
+//    public void getCourses(final String school) {
+//        server.getCourseList(school, new Cb<JSONSchema.CourseIds>() {
+//            @Override
+//            public void success(JSONSchema.CourseIds courseResults, Response response) {
+//                Realm realm = Realm.getInstance(ctx);
+//                RealmResults<Course> courses = realm.allObjects(Course.class);
+//
+//                // Unfortunately necessary because the previous course
+//                // object is in another thread.
+//                realm.beginTransaction();
+//                Log.v(TAG, "Setting school for " + courses.size() + " Courses");
+//                Log.v(TAG, "Supposed to have " + courseResults.ids.length + " Courses");
+//                for (int i = 0; i < courses.size(); i++) {
+//                    courses.get(i).setSchool(school);
+//                }
+//                realm.commitTransaction();
+//                realm.close();
+//                getEvents();
+//            }
+//        });
+//    }
 
 
     // TODO: Consolidate HTTP calls - we make O(n) calls, n = number of courses
@@ -192,6 +133,6 @@ public class LocalDB {
      */
     public void update(Context ctx) {
         Log.v(TAG, "UPDATE");
-        getCourses("UMass-Amherst");
+        //getCourses("UMass-Amherst");
     }
 }

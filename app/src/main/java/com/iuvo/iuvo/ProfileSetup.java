@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,10 +17,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
+import com.iuvo.iuvo.schemas.Event;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -26,17 +32,161 @@ import io.realm.RealmResults;
 
 
 public class ProfileSetup extends ActionBarActivity {
+    public static final String TAG = "ProfileSetup";
+    Context context;
     Realm realm;
     RealmResults<Course> result;
     Spinner spinner;
     AutoCompleteTextView pickClass;
-    String[] universities = {"UMass-Amherst", "Utorronto"};
-    String[] course = {"CS 121", "ECE 211", "Bio 151", "CS240", "Phil 112"};
+
+    ArrayAdapter<String> schoolAdapter;
+    ArrayAdapter<String> courseAdapter;
+    SchoolsTask sTask;
+    CourseTask cTask;
+
+    AsyncServer.CourseInfo[] courseInfoList;
 
     SharedPreferences mPrefs;
     final String welcomeScreenShownPref = "welcomeScreenShown";
     public ProgressDialog myDialog;
 
+
+    private class SchoolsTask extends AsyncServer<Void,Void,String[]> {
+
+        public static final String TAG = "SchoolsTask";
+
+        public SchoolsTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            super.doInBackground(params);
+            return getIuvoServer().getSchools();
+        }
+
+        @Override
+        protected void onPostExecute(String[] newSchools) {
+            super.onPostExecute(newSchools);
+            for (String school : newSchools)
+                Log.v(TAG, school);
+
+            schoolAdapter.clear();
+            schoolAdapter.addAll(newSchools);
+        }
+    }
+
+    private class CourseTask extends AsyncServer<Void,Void,String[]> {
+
+        public static final String TAG = "CourseTask";
+
+        public CourseTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            super.doInBackground(params);
+
+            Log.v(TAG, "CourseTask schoolname: " + spinner.getSelectedItem().toString());
+            courseInfoList = getIuvoServer().getCourseList(spinner.getSelectedItem().toString());
+
+            if (isCancelled())
+                return null;
+
+            String[] newCourses = new String[courseInfoList.length];
+            for (int i = 0; i < courseInfoList.length; i++)
+                newCourses[i] = courseInfoList[i].getSubject() + courseInfoList[i].getCode();
+            return newCourses;
+        }
+
+        @Override
+        protected void onPostExecute(String[] newCourses) {
+            super.onPostExecute(newCourses);
+
+            courseAdapter.clear();
+            courseAdapter.addAll(newCourses);
+
+            CourseDetailTask task = new CourseDetailTask();
+            task.execute("UMass-Amherst");
+        }
+    }
+
+    private class CourseDetailTask extends AsyncServer<String,Void,Course[]> {
+        public static final String TAG = "CourseDetailTask";
+
+        public CourseDetailTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected Course[] doInBackground(String... params) {
+            super.doInBackground(params);
+            String school = params[0];
+
+            Realm realm = null;
+            try {
+                realm = Realm.getInstance(context);
+                Course[] ret = new Course[courseInfoList.length];
+
+                int i = 0;
+                while (i < courseInfoList.length) {
+                    CourseInfo ci = courseInfoList[i];
+                    ret[i++] = getIuvoServer().getCourse(school, ci.getSubject(), ci.getCode());
+                }
+
+                realm.beginTransaction();
+                for (Course c : ret)
+                    c.setSchool(school);
+                realm.commitTransaction();
+
+                return ret;
+            }
+            catch (Exception ex) {
+                if (realm != null) realm.cancelTransaction();
+                throw ex;
+            }
+            finally {
+                if (realm != null) realm.close();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Course[] param) {
+            super.onPostExecute(param);
+            EventsTask eTask = new EventsTask();
+            eTask.execute(param);
+        }
+    }
+
+    private class EventsTask extends AsyncServer<Course,Integer,Void> {
+        public static final String TAG = "EventsTask";
+
+        public EventsTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected Void doInBackground(Course... courses) {
+            super.doInBackground(courses);
+
+            try {
+                Realm realm = Realm.getInstance(context);
+                for (Course c : realm.allObjects(Course.class)) {
+                    Log.v(TAG, c.getSchool()+"/"+c.getSubject()+"/"+c.getCode());
+                    getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
+                }
+                return null;
+            }
+            finally {
+                if (realm != null) realm.close();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,31 +199,53 @@ public class ProfileSetup extends ActionBarActivity {
         // second argument is the default to use if the preference can't be found
         Boolean welcomeScreenShown = mPrefs.getBoolean(welcomeScreenShownPref, false);
 
-        if(welcomeScreenShown){
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+
+//        if(welcomeScreenShown){
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
+//            // This actually will still execute all the below code...
+//            finish();
+//        }
 
         SharedPreferences.Editor editor = mPrefs.edit();
         editor.putBoolean(welcomeScreenShownPref, true);
         editor.commit();
 
-        final Context context = this;
+        context = (Context) this;
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
         spinner = (Spinner) findViewById(R.id.pickUniversity);
 
         realm = Realm.getInstance(this);
         result = realm.where(Course.class).findAll();
 
+
+        schoolAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, new ArrayList<String>());
+        schoolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(schoolAdapter);
+
+        sTask = new SchoolsTask();
+        sTask.execute();
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (cTask != null)
+                    cTask.cancel(true);
+
+                cTask = new CourseTask();
+                cTask.execute();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         //CustomAdapter courseAdapter = new CustomAdapter(this, result);
-        ArrayAdapter<String> autoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, course );
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, universities);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        pickClass.setAdapter(autoAdapter);
-
+        courseAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
+        pickClass.setAdapter(courseAdapter);
 
 
         pickClass.setOnItemClickListener(new OnItemClickListener() {
@@ -82,9 +254,8 @@ public class ProfileSetup extends ActionBarActivity {
                 AutoCompleteTextView addClass = new AutoCompleteTextView(context);
                 addClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
 
-        }
+            }
         });
-
     }
 
 
@@ -109,6 +280,13 @@ public class ProfileSetup extends ActionBarActivity {
             txt.setText(subject + code);
             return convertView;
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.v(TAG, "onDestroy");
+        realm.close();
     }
 
 

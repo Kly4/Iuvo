@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
     SharedPreferences mPrefs;
     final String LocalDbUpdate = "updated";
     Realm realm;
+    CustomAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,22 +46,22 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        realm = Realm.getInstance(this);
 
         // second argument is the default to use if the preference can't be found
         Boolean LocalDbUpdated = mPrefs.getBoolean(LocalDbUpdate, false);
 
-        if(!LocalDbUpdated){
-            // idk lol
-            Realm.deleteRealmFile(this);
-            (new LocalDB(this)).update(this);
-            SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putBoolean(LocalDbUpdate, true);
-            editor.commit();
-        }
+//        if(!LocalDbUpdated){
+//            // idk lol
+//            Realm.deleteRealmFile(this);
+//            (new LocalDB(this)).update(this);
+//            SharedPreferences.Editor editor = mPrefs.edit();
+//            editor.putBoolean(LocalDbUpdate, true);
+//            editor.commit();
+//        }
 
         ListView view = (ListView) findViewById(R.id.event_list);
-        final CustomAdapter adapter = new CustomAdapter(this, realm.where(Event.class).findAll());
+        realm = Realm.getInstance(this);
+        adapter = new CustomAdapter(this, realm.where(Event.class).findAll());
         view.setAdapter(adapter);
 
         realm.addChangeListener(new RealmChangeListener() {
