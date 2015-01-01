@@ -51,43 +51,50 @@ public class JSONSchema {
             this.ids = ids;
         }
     }
-    public static class CourseId {
-        public String id;
-        CourseId(String id) {
-            this.id = id;
+    public static class CourseIds {
+        public String[] ids;
+        CourseIds(String[] ids) {
+            this.ids = ids;
         }
     }
 
-    public class CourseDeserializer implements JsonDeserializer<CourseId> {
+    public class CourseDeserializer implements JsonDeserializer<CourseIds> {
         public static final String TAG = "CourseDeserializer";
 
         @Override
-        public CourseId deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
+        public CourseIds deserialize(JsonElement jsonElement, Type t, JsonDeserializationContext jctx) {
             Realm realm = Realm.getInstance(ctx);
             realm.beginTransaction();
-            JsonObject json = jsonElement.getAsJsonObject();
+            JsonArray jsonArray = jsonElement.getAsJsonArray();
+            String[] ids = new String[jsonArray.size()];
 
-            Course course = realm.createObject(Course.class);
+            try {
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject json = jsonArray.get(i).getAsJsonObject();
 
-            CourseId cid = new CourseId(json.get("_id").getAsString());
-            course.setId(cid.id);
+                    Course course = realm.createObject(Course.class);
 
-            course.setSubject(json.get("subject").getAsString());
-            course.setCode(json.get("code").getAsString());
-            course.setInstructor(json.get("instructor").getAsString());
-            course.setTitle(json.get("title").getAsString());
+                    ids[i] = json.get("_id").getAsString();
+                    course.setId(ids[i]);
 
-            realm.commitTransaction();
-            Log.v(TAG, "Created Course in realm: " + course.getTitle());
+                    course.setSubject(json.get("subject").getAsString());
+                    course.setCode(json.get("code").getAsString());
+                    course.setInstructor(json.get("instructor").getAsString());
+                    course.setTitle(json.get("title").getAsString());
+
+                    Log.v(TAG, "Created Course in realm: " + course.getTitle());
+                }
+                realm.commitTransaction();
+                Log.v(TAG, "...committed.");
+            }
+            catch (Exception ex) {
+                realm.cancelTransaction();
+                Log.e(TAG, "Failed to create all the above Courses ", ex);
+                Log.e(TAG, jsonElement.toString());
+            }
+
             realm.close();
-            return cid;
-//            try {
-//            } catch (Exception ex) {
-//                realm.cancelTransaction();
-//                Log.e(TAG, "Failed to create Course ", ex);
-//                Log.e(TAG, jsonElement.toString());
-//                return null;
-//            }
+            return new CourseIds(ids);
         }
     }
 
@@ -131,6 +138,7 @@ public class JSONSchema {
                 Log.e(TAG, "Failed to create all the above Events ", ex);
                 Log.e(TAG, jsonElement.toString());
             }
+
             realm.close();
             return new EventIds(ids);
         }

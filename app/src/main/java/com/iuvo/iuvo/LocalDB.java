@@ -27,7 +27,6 @@ import retrofit.http.*;
  */
 public class LocalDB {
     private static final String TAG = "LocalDB";
-    public static boolean updated = false;
     private static final String SERVER = "http://ec2-54-173-210-203.compute-1.amazonaws.com";
 
 
@@ -44,7 +43,7 @@ public class LocalDB {
          * @return A list of course info (namely a the subject and course code)
          */
         @GET("/courses/{school}")
-        void getCourseList(@Path("school") String school, Callback<List<JSONSchema.CourseId>> courses);
+        void getCourseList(@Path("school") String school, Callback<JSONSchema.CourseIds> courses);
 
 //        /**
 //         * @param school
@@ -86,7 +85,7 @@ public class LocalDB {
 
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(JSONSchema.CourseId.class, schema.getCourseDeserializer())
+                .registerTypeAdapter(JSONSchema.CourseIds.class, schema.getCourseDeserializer())
                 .registerTypeAdapter(JSONSchema.EventIds.class, schema.getEventDeserializer())
                 .create();
 
@@ -114,7 +113,6 @@ public class LocalDB {
     public void getEvents() {
         Log.v(TAG, "getEvents");
         Realm realm = Realm.getInstance(ctx);
-
         RealmResults<Course> courses = realm.where(Course.class).findAll();
         for (Course course : courses) {
 
@@ -166,15 +164,17 @@ public class LocalDB {
     }
 
     public void getCourses(final String school) {
-        server.getCourseList(school, new Cb<List<JSONSchema.CourseId>>() {
+        server.getCourseList(school, new Cb<JSONSchema.CourseIds>() {
             @Override
-            public void success(List<JSONSchema.CourseId> courseResults, Response response) {
+            public void success(JSONSchema.CourseIds courseResults, Response response) {
                 Realm realm = Realm.getInstance(ctx);
-                RealmResults<Course> courses = realm.where(Course.class).findAll();
+                RealmResults<Course> courses = realm.allObjects(Course.class);
 
                 // Unfortunately necessary because the previous course
                 // object is in another thread.
                 realm.beginTransaction();
+                Log.v(TAG, "Setting school for " + courses.size() + " Courses");
+                Log.v(TAG, "Supposed to have " + courseResults.ids.length + " Courses");
                 for (int i = 0; i < courses.size(); i++) {
                     courses.get(i).setSchool(school);
                 }

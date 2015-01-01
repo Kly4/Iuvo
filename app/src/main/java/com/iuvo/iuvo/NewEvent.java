@@ -32,8 +32,6 @@ public class NewEvent extends ActionBarActivity {
     EditText note;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +50,12 @@ public class NewEvent extends ActionBarActivity {
         //ArrayAdapter cs = new ArrayAdapter(this, android.R.layout.simple_spinner_item, result.toArray());
         //cs.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(cs);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        realm.close();
     }
 
 
