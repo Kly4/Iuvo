@@ -22,9 +22,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
-import com.iuvo.iuvo.schemas.Event;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -41,12 +42,10 @@ public class ProfileSetup extends ActionBarActivity {
     LinearLayout list;
     //Button addClass;
 
-
+    Map<String, AsyncServer.CourseInfo> selectedCourses;
 
     ArrayAdapter<String> schoolAdapter;
     ArrayAdapter<String> courseAdapter;
-
-    AsyncServer.CourseInfo[] courseInfoList;
 
     SharedPreferences mPrefs;
     final String welcomeScreenShownPref = "welcomeScreenShown";
@@ -94,7 +93,8 @@ public class ProfileSetup extends ActionBarActivity {
             super.doInBackground(params);
 
             Log.v(TAG, "CourseTask schoolname: " + spinner.getSelectedItem().toString());
-            courseInfoList = getIuvoServer().getCourseList(spinner.getSelectedItem().toString());
+            CourseInfo[] courseInfoList =
+                    getIuvoServer().getCourseList(spinner.getSelectedItem().toString());
 
             if (isCancelled())
                 return null;
@@ -111,13 +111,10 @@ public class ProfileSetup extends ActionBarActivity {
 
             courseAdapter.clear();
             courseAdapter.addAll(newCourses);
-
-            CourseDetailTask task = new CourseDetailTask();
-            task.execute("UMass-Amherst");
         }
     }
 
-    private class CourseDetailTask extends AsyncServer<String,Void,Void> {
+    private class CourseDetailTask extends AsyncServer<AsyncServer.CourseInfo,Void,Void> {
         public static final String TAG = "CourseDetailTask";
 
         public CourseDetailTask() {
@@ -126,14 +123,15 @@ public class ProfileSetup extends ActionBarActivity {
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            super.doInBackground(params);
-            String school = params[0];
+        protected Void doInBackground(CourseInfo... courseInfoList) {
+            super.doInBackground(courseInfoList);
 
             realm = null;
             try {
                 realm = Realm.getInstance(context);
                 Course[] ret = new Course[courseInfoList.length];
+
+                String school = mPrefs.getString(getResources().getString(R.string.pSchool), "");
 
                 int i = 0;
                 while (i < courseInfoList.length) {
@@ -183,6 +181,7 @@ public class ProfileSetup extends ActionBarActivity {
         editor.commit();
 
         context = (Context) this;
+        selectedCourses = new HashMap<>();
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
         spinner = (Spinner) findViewById(R.id.pickUniversity);
         list = (LinearLayout) findViewById(R.id.list);
@@ -210,6 +209,11 @@ public class ProfileSetup extends ActionBarActivity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putString(getResources().getString(R.string.pSchool),
+                        spinner.getSelectedItem().toString());
+                editor.commit();
+
                 if (cTask != null)
                     cTask.cancel(true);
 
@@ -311,12 +315,14 @@ public class ProfileSetup extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_done) {
-            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("University", spinner.getSelectedItem().toString());
-            editor.commit();
+
+            if (selectedCourses.size() > 0) {
+                CourseDetailTask task = new CourseDetailTask();
+                task.execute((AsyncServer.CourseInfo[]) selectedCourses.values().toArray());
+            }
 
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

@@ -20,4 +20,7 @@
     <string name="title_activity_profile_setup">ProfileSetup</string>
     <string name="profile_setup">Profile Setup</string>
 
+    <!-- SharedPreferences keys -->
+    <string name="pSchool">University</string>
+
 </resources>
