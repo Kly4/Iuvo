@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
     SharedPreferences mPrefs;
     final String LocalDbUpdate = "updated";
     Realm realm;
+    Context context;
     CustomAdapter adapter;
 
     @Override
@@ -45,19 +46,9 @@ public class MainActivity extends ActionBarActivity {
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // second argument is the default to use if the preference can't be found
-        Boolean LocalDbUpdated = mPrefs.getBoolean(LocalDbUpdate, false);
+        this.context = (Context) this;
 
-//        if(!LocalDbUpdated){
-//            // idk lol
-//            Realm.deleteRealmFile(this);
-//            (new LocalDB(this)).update(this);
-//            SharedPreferences.Editor editor = mPrefs.edit();
-//            editor.putBoolean(LocalDbUpdate, true);
-//            editor.commit();
-//        }
         ListView view = (ListView) findViewById(R.id.event_list);
         realm = Realm.getInstance(this);
         adapter = new CustomAdapter(this, realm.where(Event.class).findAll());
@@ -230,4 +221,41 @@ public class MainActivity extends ActionBarActivity {
             return convertView;
         }
     }
+
+
+    private class EventsTask extends AsyncServer<Course,Integer,Void> {
+        public static final String TAG = "EventsTask";
+
+        public EventsTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected Void doInBackground(Course... courses) {
+            super.doInBackground(courses);
+
+            Realm realm = null;
+            try {
+                realm = Realm.getInstance(context);
+                for (Course c : realm.allObjects(Course.class)) {
+                    Log.v(TAG, c.getSchool()+"/"+c.getSubject()+"/"+c.getCode());
+                    Event[] events = getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
+
+                    realm.beginTransaction();
+                    for (Event e : events)
+                        e.setCourse(c);
+                    realm.commitTransaction();
+                }
+                return null;
+            }
+            finally {
+                if (realm != null) realm.close();
+            }
+        }
+    }
+
 }
+
+
+
