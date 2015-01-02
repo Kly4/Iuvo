@@ -58,7 +58,6 @@ public class MainActivity extends ActionBarActivity {
 //            editor.putBoolean(LocalDbUpdate, true);
 //            editor.commit();
 //        }
-
         ListView view = (ListView) findViewById(R.id.event_list);
         realm = Realm.getInstance(this);
         adapter = new CustomAdapter(this, realm.where(Event.class).findAll());

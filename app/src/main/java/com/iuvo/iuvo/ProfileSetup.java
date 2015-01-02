@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -13,11 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.ListAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -38,6 +38,10 @@ public class ProfileSetup extends ActionBarActivity {
     RealmResults<Course> result;
     Spinner spinner;
     AutoCompleteTextView pickClass;
+    LinearLayout list;
+    //Button addClass;
+
+
 
     ArrayAdapter<String> schoolAdapter;
     ArrayAdapter<String> courseAdapter;
@@ -49,6 +53,7 @@ public class ProfileSetup extends ActionBarActivity {
     SharedPreferences mPrefs;
     final String welcomeScreenShownPref = "welcomeScreenShown";
     public ProgressDialog myDialog;
+    InputMethodManager imm;
 
 
     private class SchoolsTask extends AsyncServer<Void,Void,String[]> {
@@ -127,7 +132,7 @@ public class ProfileSetup extends ActionBarActivity {
             super.doInBackground(params);
             String school = params[0];
 
-            Realm realm = null;
+            realm = null;
             try {
                 realm = Realm.getInstance(context);
                 Course[] ret = new Course[courseInfoList.length];
@@ -220,6 +225,13 @@ public class ProfileSetup extends ActionBarActivity {
         context = (Context) this;
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
         spinner = (Spinner) findViewById(R.id.pickUniversity);
+        list = (LinearLayout) findViewById(R.id.list);
+//        addClass = (Button) findViewById(R.id.addClass);
+//        addClass.setOnClickListener(onAddClass());
+
+        imm = (InputMethodManager)getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+
 
         realm = Realm.getInstance(this);
         result = realm.where(Course.class).findAll();
@@ -254,14 +266,49 @@ public class ProfileSetup extends ActionBarActivity {
         pickClass.setAdapter(courseAdapter);
 
 
-        pickClass.setOnItemClickListener(new OnItemClickListener() {
+
+        listener = new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                AutoCompleteTextView addClass = new AutoCompleteTextView(context);
-                addClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
-
+                onItemClickTemp(parent, view, position, id);
             }
-        });
+        };
+
+        pickClass.setOnItemClickListener(listener);
+
+    }
+
+    OnItemClickListener listener;
+    public void onItemClickTemp(AdapterView<?> parent, View view, int position, long id) {
+
+        Log.v(TAG, "HIDE KEYBOARD");
+        imm.hideSoftInputFromWindow(pickClass.getWindowToken(), 0);
+
+        AutoCompleteTextView temp = createNewTextView();
+        temp.setAdapter(courseAdapter);
+        temp.setOnItemClickListener(listener);
+        list.addView(temp);
+
+    }
+
+
+//    private View.OnClickListener onAddClass() {
+//        return new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        };
+//    }
+
+    private AutoCompleteTextView createNewTextView() {
+        //final LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        final AutoCompleteTextView auto = new AutoCompleteTextView(this);
+        auto.setHint("Pick your class");
+        //textView.setLayoutParams(lparams);
+        //textView.setText("New text: " + text);
+        return auto;
     }
 
 
@@ -317,6 +364,7 @@ public class ProfileSetup extends ActionBarActivity {
 
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+            realm.close();
             return true;
         }
         return super.onOptionsItemSelected(item);
