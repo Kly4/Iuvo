@@ -27,11 +27,11 @@ import retrofit.http.*;
  */
 public class LocalDB {
     private static final String TAG = "LocalDB";
-    private Context ctx;
+    private Context context;
 
 
     LocalDB(Context ctx) {
-        this.ctx = ctx;
+        this.context = ctx;
 
         JSONSchema schema = new JSONSchema(ctx);
 
@@ -50,6 +50,40 @@ public class LocalDB {
                         error.getResponse().getBody());
         }
     }
+
+    private class EventsTask extends AsyncServer<Course,Integer,Void> {
+        public static final String TAG = "EventsTask";
+
+        public EventsTask() {
+            super();
+            this.deserializer = new Deserializer(context);
+        }
+
+        @Override
+        protected Void doInBackground(Course... courses) {
+            super.doInBackground(courses);
+
+            Realm realm = null;
+            try {
+                realm = Realm.getInstance(context);
+                for (Course c : realm.allObjects(Course.class)) {
+                    Log.v(TAG, c.getSchool()+"/"+c.getSubject()+"/"+c.getCode());
+                    Event[] events = getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
+
+                    realm.beginTransaction();
+                    for (Event e : events)
+                        e.setCourse(c);
+                    realm.commitTransaction();
+                }
+                return null;
+            }
+            finally {
+                if (realm != null) realm.close();
+            }
+        }
+    }
+
+
 //
 //    public void getEvents() {
 //        Log.v(TAG, "getEvents");

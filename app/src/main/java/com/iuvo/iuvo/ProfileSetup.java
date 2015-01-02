@@ -45,8 +45,6 @@ public class ProfileSetup extends ActionBarActivity {
 
     ArrayAdapter<String> schoolAdapter;
     ArrayAdapter<String> courseAdapter;
-    SchoolsTask sTask;
-    CourseTask cTask;
 
     AsyncServer.CourseInfo[] courseInfoList;
 
@@ -119,7 +117,7 @@ public class ProfileSetup extends ActionBarActivity {
         }
     }
 
-    private class CourseDetailTask extends AsyncServer<String,Void,Course[]> {
+    private class CourseDetailTask extends AsyncServer<String,Void,Void> {
         public static final String TAG = "CourseDetailTask";
 
         public CourseDetailTask() {
@@ -128,7 +126,7 @@ public class ProfileSetup extends ActionBarActivity {
         }
 
         @Override
-        protected Course[] doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             super.doInBackground(params);
             String school = params[0];
 
@@ -148,7 +146,7 @@ public class ProfileSetup extends ActionBarActivity {
                     c.setSchool(school);
                 realm.commitTransaction();
 
-                return ret;
+                return null;
             }
             catch (Exception ex) {
                 if (realm != null) realm.cancelTransaction();
@@ -158,46 +156,8 @@ public class ProfileSetup extends ActionBarActivity {
                 if (realm != null) realm.close();
             }
         }
-
-        @Override
-        protected void onPostExecute(Course[] param) {
-            super.onPostExecute(param);
-            EventsTask eTask = new EventsTask();
-            eTask.execute(param);
-        }
     }
 
-    private class EventsTask extends AsyncServer<Course,Integer,Void> {
-        public static final String TAG = "EventsTask";
-
-        public EventsTask() {
-            super();
-            this.deserializer = new Deserializer(context);
-        }
-
-        @Override
-        protected Void doInBackground(Course... courses) {
-            super.doInBackground(courses);
-
-            Realm realm = null;
-            try {
-                realm = Realm.getInstance(context);
-                for (Course c : realm.allObjects(Course.class)) {
-                    Log.v(TAG, c.getSchool()+"/"+c.getSubject()+"/"+c.getCode());
-                    Event[] events = getIuvoServer().getEventList(c.getSchool(), c.getSubject(), c.getCode());
-
-                    realm.beginTransaction();
-                    for (Event e : events)
-                        e.setCourse(c);
-                    realm.commitTransaction();
-                }
-                return null;
-            }
-            finally {
-                if (realm != null) realm.close();
-            }
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,10 +202,12 @@ public class ProfileSetup extends ActionBarActivity {
         schoolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(schoolAdapter);
 
-        sTask = new SchoolsTask();
+        SchoolsTask sTask = new SchoolsTask();
         sTask.execute();
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            CourseTask cTask;
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (cTask != null)
@@ -335,12 +297,6 @@ public class ProfileSetup extends ActionBarActivity {
         }
     }
 
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Log.v(TAG, "onDestroy");
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -369,5 +325,4 @@ public class ProfileSetup extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }
