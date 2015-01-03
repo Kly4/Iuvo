@@ -27,6 +27,8 @@ import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
 import com.iuvo.iuvo.schemas.Event;
+import com.iuvo.iuvo.server.AsyncServer;
+import com.iuvo.iuvo.server.Deserializer;
 import com.iuvo.iuvo.slidingmenu.CommunityFragment;
 import com.iuvo.iuvo.slidingmenu.FindPeopleFragment;
 import com.iuvo.iuvo.slidingmenu.HomeFragment;

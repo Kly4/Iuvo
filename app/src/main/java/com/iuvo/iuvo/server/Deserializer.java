@@ -1,4 +1,4 @@
-package com.iuvo.iuvo;
+package com.iuvo.iuvo.server;
 
 import android.content.Context;
 import android.util.Log;

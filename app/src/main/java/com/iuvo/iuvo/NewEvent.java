@@ -119,6 +119,4 @@ public class NewEvent extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
 }

@@ -22,13 +22,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
+import com.iuvo.iuvo.server.AsyncServer;
+import com.iuvo.iuvo.server.Deserializer;
+import com.iuvo.iuvo.server.CourseInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -46,7 +47,7 @@ public class ProfileSetup extends ActionBarActivity {
     //Button addClass;
 
     /** Map for getting a courseInfo object from a full course code ("CSC123") */
-    Map<String, AsyncServer.CourseInfo> courseCodeMap;
+    Map<String, CourseInfo> courseCodeMap;
 
     ArrayAdapter<String> schoolAdapter;
     ArrayAdapter<String> courseAdapter;
@@ -122,7 +123,7 @@ public class ProfileSetup extends ActionBarActivity {
     }
 
     /** Opens MainActivity when complete. */
-    private class SaveCoursesToLocalDB extends AsyncServer<AsyncServer.CourseInfo,Void,Void> {
+    private class SaveCoursesToLocalDB extends AsyncServer<CourseInfo,Void,Void> {
         public static final String TAG = "CourseDetailTask";
 
         public SaveCoursesToLocalDB() {
@@ -350,10 +351,10 @@ public class ProfileSetup extends ActionBarActivity {
 
             // For each nonempty selected course code, look up the CourseInfo object and
             // start the task of saving the full course to the local database.
-            Collection<AsyncServer.CourseInfo> courseInfo = new ArrayList<AsyncServer.CourseInfo>();
+            Collection<CourseInfo> courseInfo = new ArrayList<CourseInfo>();
             for (int i = 0; i < list.getChildCount(); i++) {
                 String courseCode = ((AutoCompleteTextView) list.getChildAt(i)).getText().toString();
-                AsyncServer.CourseInfo info = courseCodeMap.get(courseCode);
+                CourseInfo info = courseCodeMap.get(courseCode);
                 if (info != null) {
                     courseInfo.add(info);
                 }
@@ -361,7 +362,7 @@ public class ProfileSetup extends ActionBarActivity {
 
             // When finished, it will start up MainActivity.
             SaveCoursesToLocalDB task = new SaveCoursesToLocalDB();
-            task.execute(courseInfo.toArray(new AsyncServer.CourseInfo[1]));
+            task.execute(courseInfo.toArray(new CourseInfo[1]));
 
 
             return true;
