@@ -24,8 +24,11 @@ import android.widget.TextView;
 import com.iuvo.iuvo.schemas.Course;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -42,7 +45,8 @@ public class ProfileSetup extends ActionBarActivity {
     LinearLayout list;
     //Button addClass;
 
-    Map<String, AsyncServer.CourseInfo> selectedCourses;
+    /** Map for getting a courseInfo object from a full course code ("CSC123") */
+    Map<String, AsyncServer.CourseInfo> courseCodeMap;
 
     ArrayAdapter<String> schoolAdapter;
     ArrayAdapter<String> courseAdapter;
@@ -99,9 +103,12 @@ public class ProfileSetup extends ActionBarActivity {
             if (isCancelled())
                 return null;
 
+            // Create a list of full course codes ("CSC123") and populate courseCodeMap
             String[] newCourses = new String[courseInfoList.length];
-            for (int i = 0; i < courseInfoList.length; i++)
+            for (int i = 0; i < courseInfoList.length; i++) {
                 newCourses[i] = courseInfoList[i].getSubject() + courseInfoList[i].getCode();
+                courseCodeMap.put(newCourses[i], courseInfoList[i]);
+            }
             return newCourses;
         }
 
@@ -114,10 +121,11 @@ public class ProfileSetup extends ActionBarActivity {
         }
     }
 
-    private class CourseDetailTask extends AsyncServer<AsyncServer.CourseInfo,Void,Void> {
+    /** Opens MainActivity when complete. */
+    private class SaveCoursesToLocalDB extends AsyncServer<AsyncServer.CourseInfo,Void,Void> {
         public static final String TAG = "CourseDetailTask";
 
-        public CourseDetailTask() {
+        public SaveCoursesToLocalDB() {
             super();
             this.deserializer = new Deserializer(context);
         }
@@ -126,39 +134,61 @@ public class ProfileSetup extends ActionBarActivity {
         protected Void doInBackground(CourseInfo... courseInfoList) {
             super.doInBackground(courseInfoList);
 
-            realm = null;
+            Realm realm = null;
             try {
                 realm = Realm.getInstance(context);
-                Course[] ret = new Course[courseInfoList.length];
+                ArrayList<Course> newCourses = new ArrayList<>();
 
                 String school = mPrefs.getString(getResources().getString(R.string.pSchool), "");
 
+                // Get all the courses and save them.
                 int i = 0;
-                while (i < courseInfoList.length) {
-                    CourseInfo ci = courseInfoList[i];
-                    ret[i++] = getIuvoServer().getCourse(school, ci.getSubject(), ci.getCode());
+                for (CourseInfo ci : courseInfoList) {
+                    String s = ci.getSubject(), c = ci.getCode();
+
+                    // Only create the course if it's not already in the DB
+                    Course course = realm.where(Course.class)
+                            .equalTo("school", school)
+                            .equalTo("subject", s)
+                            .equalTo("code", c)
+                            .findFirst();
+                    if (course == null)
+                        newCourses.add(getIuvoServer().getCourse(school, s, c));
                 }
 
-                realm.beginTransaction();
-                for (Course c : ret)
-                    c.setSchool(school);
-                realm.commitTransaction();
+                // For some reason I couldn't get the school to be returned, so we have to
+                // set it manually.
+                try {
+                    realm.beginTransaction();
+                    for (Course c : newCourses)
+                        c.setSchool(school);
+                    realm.commitTransaction();
+                }
+                catch(Exception ex) {
+                    realm.cancelTransaction();
+                    Log.e(TAG, "Could not save courses to LocalDB", ex);
+                }
 
                 return null;
-            }
-            catch (Exception ex) {
-                if (realm != null) realm.cancelTransaction();
-                throw ex;
             }
             finally {
                 if (realm != null) realm.close();
             }
+        }
+
+        @Override
+        protected void onPostExecute(Void params) {
+            super.onPostExecute(params);
+
+            Intent intent = new Intent(context, MainActivity.class);
+            startActivity(intent);
         }
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
@@ -181,7 +211,9 @@ public class ProfileSetup extends ActionBarActivity {
         editor.commit();
 
         context = (Context) this;
-        selectedCourses = new HashMap<>();
+
+        courseCodeMap = new HashMap<>();
+
         pickClass = (AutoCompleteTextView) findViewById(R.id.autoCompleteClass);
         spinner = (Spinner) findViewById(R.id.pickUniversity);
         list = (LinearLayout) findViewById(R.id.list);
@@ -226,12 +258,10 @@ public class ProfileSetup extends ActionBarActivity {
             }
         });
 
-        //CustomAdapter courseAdapter = new CustomAdapter(this, result);
+
         courseAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         pickClass.setAdapter(courseAdapter);
-
-
 
         listener = new OnItemClickListener() {
             @Override
@@ -241,7 +271,6 @@ public class ProfileSetup extends ActionBarActivity {
         };
 
         pickClass.setOnItemClickListener(listener);
-
     }
 
     OnItemClickListener listener;
@@ -315,18 +344,26 @@ public class ProfileSetup extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_done) {
 
-            if (selectedCourses.size() > 0) {
-                CourseDetailTask task = new CourseDetailTask();
-                task.execute((AsyncServer.CourseInfo[]) selectedCourses.values().toArray());
+            // For each nonempty selected course code, look up the CourseInfo object and
+            // start the task of saving the full course to the local database.
+            Collection<AsyncServer.CourseInfo> courseInfo = new ArrayList<AsyncServer.CourseInfo>();
+            for (int i = 0; i < list.getChildCount(); i++) {
+                String courseCode = ((AutoCompleteTextView) list.getChildAt(i)).getText().toString();
+                AsyncServer.CourseInfo info = courseCodeMap.get(courseCode);
+                if (info != null) {
+                    courseInfo.add(info);
+                }
             }
 
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            realm.close();
+            // When finished, it will start up MainActivity.
+            SaveCoursesToLocalDB task = new SaveCoursesToLocalDB();
+            task.execute(courseInfo.toArray(new AsyncServer.CourseInfo[1]));
+
+
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -46,8 +46,6 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-;
-
 
 
 public class MainActivity extends ActionBarActivity {
@@ -441,7 +439,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    private class EventsTask extends AsyncServer<Course,Integer,Void> {
+    private class EventsTask extends AsyncServer<Void,Void,Void> {
         public static final String TAG = "EventsTask";
 
         public EventsTask() {
@@ -450,8 +448,8 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Void doInBackground(Course... courses) {
-            super.doInBackground(courses);
+        protected Void doInBackground(Void... params) {
+            super.doInBackground(params);
 
             Realm realm = null;
             try {
