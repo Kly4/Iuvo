@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity {
     final String LocalDbUpdate = "updated";
     Realm realm;
     Context context;
-    CustomAdapter eventAdapter;
+    EventListAdapter eventAdapter;
 
     //DEMO CODE BEGINS
     private DrawerLayout mDrawerLayout;
@@ -92,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
 
         ListView view = (ListView) findViewById(R.id.event_list);
         realm = Realm.getInstance(this);
-        eventAdapter = new CustomAdapter(this, realm.where(Event.class).findAll());
+        eventAdapter = new EventListAdapter(this, realm.where(Event.class).findAll());
         view.setAdapter(eventAdapter);
 
         realm.addChangeListener(new RealmChangeListener() {
@@ -311,140 +311,10 @@ public class MainActivity extends ActionBarActivity {
     //DEMO CODE END
 
 
-    class CustomAdapter extends RealmBaseAdapter<Event> {
-        private static final String TAG = "CustomAdapter";
-        private final Context context;
-        private final RealmResults<Event> values;
-        private HashMap<String, String> courseColors;
-        LinearLayout leftblock;
-        GradientDrawable shape;
-
-        String[] colors;
-        int colorCount;
-
-
-        public CustomAdapter(Context context, RealmResults<Event> values) {
-            super(context, values, false);
-            this.context = context;
-            this.values = values;
-
-
-            RealmResults<Course> courses = realm.where(Course.class).findAll();
-            courseColors = new HashMap<>();
-            colors = getResources().getStringArray(R.array.colors);
-
-            colorCount = 0;
-            for (Course course : courses) {
-                String courseCode = course.getSubject()+course.getCode();
-                if (courseColors.get(courseCode) == null)
-                    courseColors.put(courseCode, colors[colorCount++ % colors.length]);
-            }
-
-            Log.v(TAG, "Launched with " + values.size() + " elements");
-        }
-
-        // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
-        class ViewHolder {
-            TextView subject;
-            TextView code;
-            TextView date;
-            TextView timeAt;
-            TextView timeTill;
-            TextView location;
-            CheckBox checkbox;
-            TextView attendance;
-
-
-            public ViewHolder(View convertView, int position) {
-                subject = (TextView) convertView.findViewById(R.id.classname);
-                code = (TextView) convertView.findViewById(R.id.classnumber);
-                date = (TextView) convertView.findViewById(R.id.date);
-                timeAt = (TextView) convertView.findViewById(R.id.timeat);
-                timeTill = (TextView) convertView.findViewById(R.id.timetill);
-                location = (TextView) convertView.findViewById(R.id.location);
-                checkbox = (CheckBox) convertView.findViewById(R.id.button);
-                attendance = (TextView) convertView.findViewById(R.id.attendance);
-                Event item = realmResults.get(position);
-                checkbox.setTag(item);
-                checkbox.setChecked(item.isCheckState());
-                leftblock = (LinearLayout) convertView.findViewById(R.id.leftblock);
-                shape = (GradientDrawable) leftblock.getBackground();
-            }
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Log.v(TAG, "getView " + String.valueOf(position));
-
-            ViewHolder view;
-            Event item = realmResults.get(position);
-            Course course = item.getCourse();
-
-            //if (convertView == null) {
-            convertView = inflater.inflate(R.layout.row_layout, parent, false);
-
-            view = new ViewHolder(convertView, position);
-            convertView.setTag(view);
-
-            String courseCode = course.getSubject() + course.getCode();
-            String color = courseColors.get(courseCode);
-            // This course does not already have a color mapping
-            if (color == null) {
-                color = colors[colorCount++ % colors.length];
-                courseColors.put(courseCode, color);
-            }
-            shape.setColor(Color.parseColor(color));
-
-//          } else {
-//              view = (ViewHolder) convertView.getTag();
-//          }
-
-
-            view.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                    // checkedId is the RadioButton selected
-                    Log.v(TAG, "Clicked");
-                    realm.beginTransaction();
-                    Event item = (Event) button.getTag();
-                    if(isChecked){
-                        item.setNumAttendees(item.getNumAttendees() + 1);
-                        item.setCheckState(true);
-                    }
-                    else {
-                        item.setNumAttendees(item.getNumAttendees() - 1);
-                        item.setCheckState(false);
-                    }
-                    realm.commitTransaction();
-                    notifyDataSetChanged();
-                }
-            });
-
-
-            // Should produce: "12:13 PM"
-            DateFormat time = new SimpleDateFormat("hh:mm a");
-            view.timeAt.setText(time.format(item.getStartTime()));
-            view.timeTill.setText(time.format(item.getEndTime()));
-
-            view.location.setText(item.getLocation());
-            view.subject.setText(course.getSubject());
-            view.code.setText(course.getCode());
-
-            // Should produce: "Jul 4"
-            DateFormat date = new SimpleDateFormat("MMM d");
-            view.date.setText(date.format(item.getStartTime()));
-
-            view.attendance.setText(String.valueOf(item.getNumAttendees()));
-
-            return convertView;
-        }
-    }
-
-
-    private class EventsTask extends AsyncServer<Void,Void,Void> {
+    private class UpdateEvents extends AsyncServer<Void,Void,Void> {
         public static final String TAG = "EventsTask";
 
-        public EventsTask() {
+        public UpdateEvents() {
             super();
             this.deserializer = new Deserializer(context);
         }
