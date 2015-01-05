@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -17,36 +15,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
 import com.iuvo.iuvo.schemas.Event;
 import com.iuvo.iuvo.server.AsyncServer;
 import com.iuvo.iuvo.server.Deserializer;
-import com.iuvo.iuvo.slidingmenu.CommunityFragment;
 import com.iuvo.iuvo.slidingmenu.FindPeopleFragment;
-import com.iuvo.iuvo.slidingmenu.HomeFragment;
 import com.iuvo.iuvo.slidingmenu.NavDrawerItem;
-import com.iuvo.iuvo.slidingmenu.PagesFragment;
-import com.iuvo.iuvo.slidingmenu.PhotosFragment;
-import com.iuvo.iuvo.slidingmenu.WhatsHotFragment;
 import com.iuvo.iuvo.slidingmenu.adapter.NavDrawerListAdapter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import io.realm.Realm;
-import io.realm.RealmBaseAdapter;
 import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
+
 
 
 
@@ -121,17 +105,17 @@ public class MainActivity extends ActionBarActivity {
 
         // adding nav drawer items to array
         // Home
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+        navDrawerItems.add(new NavDrawerItem("All Study Sessions", navMenuIcons.getResourceId(0, -1)));
         // Find People
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+        navDrawerItems.add(new NavDrawerItem("My Study Sessions", navMenuIcons.getResourceId(1, -1)));
         // Photos
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
-        // Communities, Will add a counter here
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
-        // Pages
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
-        // What's hot, We  will add a counter here
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1), true, "50+"));
+        navDrawerItems.add(new NavDrawerItem("Profile Setup", navMenuIcons.getResourceId(2, -1)));
+//        // Communities, Will add a counter here
+//        navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
+//        // Pages
+//        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+//        // What's hot, We  will add a counter here
+//        navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1), true, "50+"));
 
 
         // Recycle the typed array
@@ -192,23 +176,26 @@ public class MainActivity extends ActionBarActivity {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new HomeFragment();
+                //fragment = new HomeFragment();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
                 break;
             case 1:
                 fragment = new FindPeopleFragment();
                 break;
             case 2:
-                fragment = new PhotosFragment();
+                Intent intent1 = new Intent(this, ProfileSetup.class);
+                startActivity(intent1);;
                 break;
-            case 3:
-                fragment = new CommunityFragment();
-                break;
-            case 4:
-                fragment = new PagesFragment();
-                break;
-            case 5:
-                fragment = new WhatsHotFragment();
-                break;
+//            case 3:
+//                fragment = new CommunityFragment();
+//                break;
+//            case 4:
+//                fragment = new PagesFragment();
+//                break;
+//            case 5:
+//                fragment = new WhatsHotFragment();
+//                break;
 
             default:
                 break;

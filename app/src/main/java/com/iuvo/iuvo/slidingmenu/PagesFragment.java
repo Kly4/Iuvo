@@ -11,7 +11,7 @@ import com.iuvo.iuvo.R;
 public class PagesFragment extends Fragment {
 	
 	public PagesFragment(){}
-	
+
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {

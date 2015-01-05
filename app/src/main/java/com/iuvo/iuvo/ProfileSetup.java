@@ -23,8 +23,8 @@ import android.widget.TextView;
 
 import com.iuvo.iuvo.schemas.Course;
 import com.iuvo.iuvo.server.AsyncServer;
-import com.iuvo.iuvo.server.Deserializer;
 import com.iuvo.iuvo.server.CourseInfo;
+import com.iuvo.iuvo.server.Deserializer;
 
 import java.util.ArrayList;
 import java.util.Collection;
