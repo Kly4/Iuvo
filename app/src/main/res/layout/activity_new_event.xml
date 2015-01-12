@@ -11,27 +11,28 @@
         android:hint="Class"
         android:id="@+id/pickClass"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="15dp" />
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Time"
-        android:inputType="time"
         android:ems="10"
         android:id="@+id/Time"
         android:layout_below="@+id/Date"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:focusableInTouchMode="false"/>
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Date"
-        android:inputType="date"
         android:ems="10"
         android:id="@+id/Date"
         android:layout_below="@+id/pickClass"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:focusableInTouchMode="false"/>
 
     <EditText
         android:layout_width="fill_parent"
@@ -39,7 +40,9 @@
         android:hint="Location"
         android:id="@+id/Location"
         android:layout_below="@+id/Time"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
 
     <EditText
         android:layout_width="fill_parent"
@@ -47,14 +50,16 @@
         android:hint="Note"
         android:id="@+id/Note"
         android:layout_below="@+id/Location"
-        android:layout_alignParentStart="true" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Allow Comments"
-        android:id="@+id/allowComments"
-        android:layout_below="@+id/Note"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="28dp" />
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+
+    <!--<CheckBox-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Allow Comments"-->
+        <!--android:id="@+id/allowComments"-->
+        <!--android:layout_below="@+id/Note"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_marginTop="28dp" />-->
 </RelativeLayout>
