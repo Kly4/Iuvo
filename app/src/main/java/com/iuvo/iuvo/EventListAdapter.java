@@ -146,8 +146,8 @@ class EventListAdapter extends RealmBaseAdapter<Event> {
         view.code.setText(course.getCode());
 
         // Should produce: "Jul 4"
-        DateFormat date = new SimpleDateFormat("MMM d");
-        view.date.setText(date.format(item.getStartTime()));
+        DateFormat d = new SimpleDateFormat("MMM d");
+        view.date.setText(d.format(item.getStartTime()));
 
         view.attendance.setText(String.valueOf(item.getNumAttendees()));
 

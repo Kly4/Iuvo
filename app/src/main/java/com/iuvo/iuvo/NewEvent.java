@@ -21,6 +21,9 @@ import com.iuvo.iuvo.schemas.Event;
 
 import org.joda.time.DateTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -32,8 +35,12 @@ public class NewEvent extends ActionBarActivity implements CalendarDatePickerDia
 
     Realm realm;
     RealmResults<Course> result;
+    String d;
+    String t;
+    SimpleDateFormat formatT;
+    SimpleDateFormat formatD;
 
-   // Date d;
+
     Spinner spinner;
     EditText date;
     EditText location;
@@ -45,6 +52,8 @@ public class NewEvent extends ActionBarActivity implements CalendarDatePickerDia
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_event);
+
+        formatT = new SimpleDateFormat("MM dd HH:mm");
 
         spinner = (Spinner) findViewById(R.id.pickClass);
         date = (EditText) findViewById(R.id.Date);
@@ -92,13 +101,15 @@ public class NewEvent extends ActionBarActivity implements CalendarDatePickerDia
     @Override
     public void onDateSet(CalendarDatePickerDialog dialog, int year, int monthOfYear, int dayOfMonth) {
 
-        date.setText("Year: " + year + "\nMonth: " + monthOfYear + "\nDay: " + dayOfMonth);
-       //d = new Date(year, monthOfYear, dayOfMonth);
+        date.setText(monthOfYear+1 + "/" + dayOfMonth + "/" + year);
+        d = monthOfYear+1 + " " + dayOfMonth;
     }
 
     @Override
     public void onDialogTimeSet(int reference, int hourOfDay, int minute) {
         time.setText("" + hourOfDay + ":" + minute);
+        t = d + " " + hourOfDay + ":" + minute;
+
     }
 
 
@@ -149,7 +160,12 @@ public class NewEvent extends ActionBarActivity implements CalendarDatePickerDia
             newEvent.setCourse(selectedCourse);
             newEvent.setNumAttendees(newEvent.getNumAttendees() + 1);
             newEvent.setCheckState(true);
-//            newEvent.setTimeAt(time.getText().toString());
+
+            try {
+                newEvent.setStartTime(formatT.parse(t));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             newEvent.setLocation(location.getText().toString());
             newEvent.setDescription(note.getText().toString());
             //newEvent.setStartTime();

@@ -67,6 +67,8 @@ public class MainActivity extends ActionBarActivity {
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDrawerTitle = "Settings";
+        mTitle = "Study Sessions";
 
         this.context = (Context) this;
 
@@ -89,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         //DEMO CODE BEGINS
-        mTitle = mDrawerTitle = getTitle();
+
 
         // load slide menu items
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
@@ -127,8 +129,8 @@ public class MainActivity extends ActionBarActivity {
         mDrawerList.setAdapter(navAdapter);
 
         // enabling action bar app icon and behaving it as toggle button
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//        getActionBar().setHomeButtonEnabled(true);
+          getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+          getSupportActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.app_name, // nav drawer open - description for accessibility
@@ -136,13 +138,13 @@ public class MainActivity extends ActionBarActivity {
         )
         {
             public void onDrawerClosed(View view) {
-                //getActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mTitle);
                 // calling onPrepareOptionsMenu() to show action bar icons
                 invalidateOptionsMenu();
             }
 
             public void onDrawerOpened(View drawerView) {
-                //getActionBar().setTitle(mDrawerTitle);
+                getSupportActionBar().setTitle(mDrawerTitle);
                 // calling onPrepareOptionsMenu() to hide action bar icons
                 invalidateOptionsMenu();
             }
@@ -273,7 +275,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        //getActionBar().setTitle(mTitle);
+        getSupportActionBar().setTitle(mTitle);
     }
 
     /**

@@ -3,7 +3,6 @@ package com.iuvo.iuvo.schemas;
 import java.util.Date;
 
 import io.realm.RealmObject;
-import io.realm.annotations.RealmClass;
 
 /**
 * Created by Dan on 2014-12-21.
@@ -20,7 +19,6 @@ public class Event extends RealmObject {
 
     private Date startTime;
     private Date endTime;
-
 
     public String getId() {
         return id;
